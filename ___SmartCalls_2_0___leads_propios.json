@@ -1,0 +1,1979 @@
+{
+  "name": "✅☢ SmartCalls 2.0 - leads propios",
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "GPT-3.5-TURBO"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Transforma el siguiente nombre para que pueda ser usado correctamente en una solicitud json y no de errores, formatealo para que no haya carácteres especiales, no admitidos por JSON.\n\n{{ $('Bucle Llamadas').item.json.contact_name }}\n\nResponde SOLAMENTE con el nombre transformado, NADA más. No des la respuesta entre comillas.\n\nRESPONDE SOLAMENTE CON EL NOMBRE RESULTANTE.\nEJ: Casetes Inmobiliaria"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -2340,
+        220
+      ],
+      "id": "bf825426-bdae-486c-b548-9b74ff37da88",
+      "name": "OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Utiliza el modelo **gpt-3.5-turbo** para transformar el nombre del negocio (**Name**) en un formato válido para JSON, eliminando caracteres especiales no admitidos.",
+        "height": 260,
+        "width": 320,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2380,
+        120
+      ],
+      "typeVersion": 1,
+      "id": "a7cfad11-3341-448b-9409-65b1e86b440c",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "Realiza una solicitud POST a la API de Retell AI.",
+        "height": 240,
+        "width": 220,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2060,
+        140
+      ],
+      "typeVersion": 1,
+      "id": "0597d323-7b0a-4641-8855-1aa912332484",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM customer\nWHERE ORIGIN_ID = 5 AND is_contacted = 0 AND call_attempts = 0 \nAND LENGTH(phone) = 9;",
+        "options": {}
+      },
+      "id": "9fc2196a-3cbd-4888-9f0a-c510dc441f36",
+      "name": "MySQL Tabla Customer",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        -3300,
+        220
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.retellai.com/v2/create-phone-call",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer key_83c9176445a69ff250c6b9fa2f75"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"from_number\": \"+34919932145\",\n  \"to_number\": \"+34{{ $('Bucle Llamadas').item.json.phone }}\",\n  \"retell_llm_dynamic_variables\": {\n    \"nombre\": \"{{ $('Bucle Llamadas').item.json.contact_name }}\"  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2000,
+        220
+      ],
+      "id": "ad1d4cd4-9e8c-4655-ac99-77704dc6270e",
+      "name": "Llamada saliente",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "# Iniciar Llamada\n",
+        "height": 280,
+        "width": 1560,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3360,
+        120
+      ],
+      "typeVersion": 1,
+      "id": "aade4d01-a465-4c8d-b6d7-ccb1f9ab28e6",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.retellai.com/v2/get-call/{{ $('Llamada saliente').item.json.call_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer key_83c9176445a69ff250c6b9fa2f75"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1560,
+        200
+      ],
+      "id": "83951c1f-9875-4ad7-af3e-318cfa264936",
+      "name": "Transcripción"
+    },
+    {
+      "parameters": {
+        "amount": 20
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1540,
+        420
+      ],
+      "id": "ecee3789-9293-4134-9f9f-8c71a5e4d115",
+      "name": "Espera",
+      "webhookId": "8fdb9b02-7dd2-4e60-80bc-00be194ccda2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c78d3787-23f8-4c91-9957-363510215ce8",
+              "leftValue": "={{ $('Ha acabado la llamada?').item.json.transcript }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -860,
+        200
+      ],
+      "id": "709baa6a-9e50-43d8-8358-bf4deefc4b25",
+      "name": "El usuario ha respondido?"
+    },
+    {
+      "parameters": {
+        "content": "Verifica si call_status es ended (finalizada) o error.\nSi es verdadero: Continúa al análisis de la respuesta del usuario.\nSi es falso: Espera 20 segundos adicionales y vuelve a consultar la transcripción.",
+        "height": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1400,
+        20
+      ],
+      "typeVersion": 1,
+      "id": "24218be9-905d-4ad6-b9ce-7f600957c3cb",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "Evalúa si el usuario respondió (**user_responded** es falso).\nSi no respondió: Actualiza el estado para una segunda llamada.\nSi respondió: Registra los resultados en otra hoja.",
+        "height": 340,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -920,
+        20
+      ],
+      "typeVersion": 1,
+      "id": "d65b11b8-a1ea-40d8-91e7-0a41e877b799",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "Registra en la base de datos que la llamada no ha sido realizada",
+        "height": 260,
+        "width": 220,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -680,
+        -100
+      ],
+      "typeVersion": 1,
+      "id": "d3de68cd-0020-4529-baf6-a8fb42a26e6b",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "Guardamos el Output de la llammada en la base de datos.",
+        "height": 240,
+        "width": 380,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -680,
+        160
+      ],
+      "typeVersion": 1,
+      "id": "f1fb2a66-c0da-4e3a-88a0-1bd5089ab764",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "Consulta el estado de la llamada a través de la API de Retell AI. Obtiene detalles como la transcripción y el análisis de la llamada.",
+        "height": 300,
+        "width": 200,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1620,
+        60
+      ],
+      "typeVersion": 1,
+      "id": "fee693c3-1321-4376-9cab-2340d553fd22",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "# Guardar Transcripción\n\n",
+        "height": 520,
+        "width": 1340,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1640,
+        -120
+      ],
+      "typeVersion": 1,
+      "id": "ea0a3b15-0bc0-48e7-8d58-faa1135009c3",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "table": {
+          "__rl": true,
+          "value": "customer",
+          "mode": "list",
+          "cachedResultName": "customer"
+        },
+        "dataMode": "defineBelow",
+        "columnToMatchOn": "place_id",
+        "valueToMatchOn": "={{ $('Bucle Llamadas').item.json.place_id }}",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "is_contacted",
+              "value": "0"
+            },
+            {
+              "column": "first_contact",
+              "value": "={{ $('DataTime').item.json.datetime }}"
+            },
+            {
+              "column": "last_contact",
+              "value": "={{ $('DataTime').item.json.datetime }}"
+            },
+            {
+              "column": "call_attempts",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "df82bb51-8afb-454a-83dc-377a85224412",
+      "name": "DB Customer (Llamada no realizada)",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        -620,
+        -20
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "table": {
+          "__rl": true,
+          "value": "contactcustomer",
+          "mode": "list",
+          "cachedResultName": "contactcustomer"
+        },
+        "dataMode": "defineBelow",
+        "columnToMatchOn": "place_id",
+        "valueToMatchOn": "={{ $('Bucle Llamadas').item.json.place_id }}",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "date",
+              "value": "={{ $('DataTime').item.json.datetime }}"
+            },
+            {
+              "column": "call_id",
+              "value": "={{ $('Transcripción').item.json.call_id }}"
+            },
+            {
+              "column": "status",
+              "value": "={{ $('Transcripción').item.json.call_status }}"
+            },
+            {
+              "column": "transcription",
+              "value": "={{ $('Transcripción').item.json.transcript }}"
+            },
+            {
+              "column": "recording",
+              "value": "={{ $('Ha acabado la llamada?').item.json.recording_url }}"
+            },
+            {
+              "column": "feeling",
+              "value": "={{ $('Ha acabado la llamada?').item.json.call_analysis.user_sentiment }}"
+            },
+            {
+              "column": "notes",
+              "value": "={{ $('Ha acabado la llamada?').item.json.call_analysis.call_summary }}"
+            },
+            {
+              "column": "duration_ms",
+              "value": "={{ $('Ha acabado la llamada?').item.json.duration_ms }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0b41cdf3-2a7b-4217-b1d8-19bcb7ff236f",
+      "name": "DB Contactcustomer (Llamada Realizada)",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        -460,
+        220
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Función para formatear la fecha\nfunction formatDate(date) {\n    const year = date.getFullYear();\n    const month = String(date.getMonth() + 1).padStart(2, '0');\n    const day = String(date.getDate()).padStart(2, '0');\n    const hours = String(date.getHours()).padStart(2, '0');\n    const minutes = String(date.getMinutes()).padStart(2, '0');\n    const seconds = String(date.getSeconds()).padStart(2, '0');\n    \n    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;\n}\n\n// Obtener la fecha y hora actuales en la zona horaria de España\nconst currentDate = new Date().toLocaleString('en-US', { timeZone: 'Europe/Madrid' });\nconst formattedDate = formatDate(new Date(currentDate));\n\n// Retornar el resultado en el formato esperado por n8n\nreturn [{\n    json: {\n        datetime: formattedDate\n    }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1160,
+        200
+      ],
+      "id": "3504a74d-030a-4d65-898f-efc17f231cb1",
+      "name": "DataTime",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -3100,
+        220
+      ],
+      "id": "7c521527-6fd7-415c-8ba0-7abaec01e5be",
+      "name": "Bucle Llamadas"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "=optimadevops@gmail.com",
+          "mode": "id",
+          "__regex": "(^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*)"
+        },
+        "timeMax": "={{ $now.plus({ week: 2 }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        -1280,
+        520
+      ],
+      "id": "42c4751c-6314-4b27-acca-fd6d77cdad7d",
+      "name": "Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "4fUd2LPCqpUzP6zm",
+          "name": "Google Calendar SmartCalls"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "fromEmail": "no-reply@smartcalls.biz",
+        "toEmail": "=patrick.optimaquantum@gmail.com",
+        "subject": "SmartCalls",
+        "emailFormat": "text",
+        "text": "=Se confirmar nuestra reunión con {{ $json.nombre }}, programada para el {{ $json.fecha_meet }} a las {{ $json.hora_meet_nueva }}. La reunión se realizará a través de la pltaforma de videollamada Google Meet.\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        400,
+        580
+      ],
+      "id": "da77ec03-6d38-4c6d-aefe-577cf9d6d524",
+      "name": "Correo Verificación Nuestro",
+      "webhookId": "e1dbea9c-06bd-4f05-9263-bd5d5df944e2",
+      "credentials": {
+        "smtp": {
+          "id": "Dx9eTPsVTPlyb1CQ",
+          "name": "SMTP SmartCalls"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "fromEmail": "no-reply@smartcalls.biz",
+        "toEmail": "={{ $('Bucle Llamadas').item.json.email }}",
+        "subject": "Confirmación de tu reunión con SmartCalls",
+        "emailFormat": "text",
+        "text": "=Estimado {{ $('Loop Over Items3').item.json.nombre }},\n\n¡Gracias por agendar una reunión con el equipo de SmartCalls!\n\n\nTe confirmamos que nuestra videollamada está programada para el {{ $('Loop Over Items3').item.json.fecha_meet }} a las {{ $('Loop Over Items3').item.json.hora_meet_nueva }}. Nos conectaremos a través de la plataforma Google Meet para conocerte mejor, entender tu negocio y explicarte cómo nuestros agentes de voz con inteligencia artificial pueden ayudarte a automatizar procesos y mejorar tu atención al cliente.\n\nSi tienes cualquier duda o inconveniente antes de la reunión, no dudes en contactarnos. Estaremos encantados de ayudarte.\n\nSitio web: smartcalls.biz\nEmail: info@smartcalls.biz\n\n¡Nos vemos muy pronto!\n\nUn cordial saludo,\nEl equipo de SmartCalls",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        580,
+        580
+      ],
+      "id": "3b04a7e8-ea11-4964-9459-b265e9813095",
+      "name": "Correo Verificación Cliente",
+      "webhookId": "e1dbea9c-06bd-4f05-9263-bd5d5df944e2",
+      "credentials": {
+        "smtp": {
+          "id": "Dx9eTPsVTPlyb1CQ",
+          "name": "SMTP SmartCalls"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e72b5ae6-3fee-4b62-8c08-2449d6862ba9",
+              "name": "nombre",
+              "value": "={{ $('Bucle Llamadas').item.json.summary }}",
+              "type": "string"
+            },
+            {
+              "id": "fd810296-0902-4b12-8a37-96e628daa024",
+              "name": "email_cliente",
+              "value": "={{ $('Bucle Llamadas').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "45da3f8f-1a3f-44b9-9556-a7eb8c662080",
+              "name": "hora_meet",
+              "value": "={{ $json.start.dateTime }}",
+              "type": "string"
+            },
+            {
+              "id": "78d0c73e-515a-450a-943d-52fe1d85b1e2",
+              "name": "description",
+              "value": "={{ $json.description }}",
+              "type": "string"
+            },
+            {
+              "id": "22db8ebe-1318-47c8-ac90-e7fcbefa5404",
+              "name": "email_empresa",
+              "value": "={{ $json.attendees[0].email }}",
+              "type": "string"
+            },
+            {
+              "id": "6a0ce824-b068-4259-9045-1dd9c8175152",
+              "name": "is_contacted",
+              "value": 0,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -740,
+        520
+      ],
+      "id": "e540a7b0-b97b-46c0-bf64-7f93f98cc378",
+      "name": "Edit Fields",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -580,
+        520
+      ],
+      "id": "9bba4b6f-905b-48a9-b4e7-d7c3db860025",
+      "name": "Loop Over Items",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener el texto del campo \"description\" del primer ítem\nconst description = $input.first().json.description;\n\n// Dividir el texto en líneas\nconst lines = description.split('\\n');\n\n// Variables para almacenar los datos extraídos\nlet meetLink = '';\nlet phoneNumber = '';\nlet phoneFound = false;\n\n// Recorrer las líneas para buscar los datos\nfor (const line of lines) {\n  // Enlace del Meet (línea con \"https://meet.google.com\")\n  if (line.includes('https://meet.google.com')) {\n    meetLink = line.trim();\n  }\n  // Número de teléfono (línea después de \"telefono:\")\n  if (phoneFound) {\n    phoneNumber = line.trim();\n    phoneFound = false; // Resetear para no seguir buscando\n  }\n  if (line.trim() === 'telefono:') {\n    phoneFound = true; // Marcar que la siguiente línea es el número\n  }\n}\n\n// Devolver los datos extraídos junto con los datos del JSON original\nreturn [{\n  json: {\n    nombre: $input.first().json.nombre,\n    email_cliente: $input.first().json.email_cliente,\n    hora_meet: $input.first().json.hora_meet,\n    meetLink: meetLink,\n    phoneNumber: phoneNumber\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        520
+      ],
+      "id": "63d58788-0438-4259-aa03-6e5499b8c225",
+      "name": "CodeFiltrarDatosCalendar",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener el primer ítem del input\nconst item = $input.first().json;\n\n// Parsear la fecha del campo \"hora_meet\" para la fecha\nconst fechaOriginal = new Date(item.hora_meet);\n\n// Extraer día, mes y año\nconst dia = fechaOriginal.getDate().toString().padStart(2, '0');\nconst mes = (fechaOriginal.getMonth() + 1).toString().padStart(2, '0');\nconst anio = fechaOriginal.getFullYear();\n\n// Extraer la hora y los minutos directamente del string ISO\nconst horaMeetString = item.hora_meet; // \"2025-04-11T17:00:00+02:00\"\nconst horaPartes = horaMeetString.split('T')[1].split(':'); // [\"17\", \"00\", \"00+02:00\"]\nconst horas = horaPartes[0]; // \"17\"\nconst minutos = horaPartes[1]; // \"00\"\n\n// Formatear la fecha y la hora\nconst fechaMeet = `${dia}-${mes}-${anio}`;\nconst horaMeetNueva = `${horas}:${minutos}`;\n\n// Devolver el objeto con los campos originales más los nuevos\nreturn [{\n  json: {\n    nombre: item.nombre,\n    email_cliente: item.email_cliente,\n    meetLink: item.meetLink,\n    phoneNumber: item.phoneNumber,\n    fecha_meet: fechaMeet,\n    hora_meet_nueva: horaMeetNueva\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        20,
+        520
+      ],
+      "id": "5fcab04b-88bf-4ca2-a87f-d9189424775b",
+      "name": "CodeHora",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        200,
+        540
+      ],
+      "id": "8c95071c-7ff7-4b89-9a47-8996eb279921",
+      "name": "Loop Over Items3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1b25bc2d-ec6a-435b-847b-5aadb25e7d3c",
+              "leftValue": "={{ $json.is_contacted }}",
+              "rightValue": "=False",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -400,
+        540
+      ],
+      "id": "567ca6d2-f220-4dfb-8559-a87faf051a2b",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bcb9edbb-9496-461c-919d-e7a27d0c4ca3",
+              "leftValue": "={{ $('Ha acabado la llamada?').item.json.duration_ms }}",
+              "rightValue": 90000,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -240,
+        220
+      ],
+      "id": "24db291d-8f4c-4223-8c67-e4103c3f84fb",
+      "name": "If",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "fromEmail": "no-reply@smartcalls.biz",
+        "toEmail": "=info@smartcalls.biz",
+        "subject": "Hemos intentado ponernos en contacto contigo - ¿Estás perdiendo clientes por no contestar?|",
+        "emailFormat": "text",
+        "text": "=Estimado {{ $('MySQL Tabla Customer').item.json.contact_name }},\n\nEl {{ $('FechaHora').item.json.fecha }} a las {{ $('FechaHora').item.json.hora }}, intentamos contactarte para presentarte SmartCalls, nuestra centralita con inteligencia artificial diseñada para que nunca más pierdas una oportunidad de negocio. No logramos hablar contigo, y esto podría ser una señal de que tu sistema actual de gestión de llamadas está dejando escapar clientes valiosos. \n\nCada llamada perdida es un cliente que se va con la competencia. ¿Sabías que el 80% de los consumidores no vuelve a contactar tras un intento fallido? Sin la tecnología adecuada, estás enfrentando:\n\n\nPérdida de ingresos: Clientes potenciales que no reciben respuesta y buscan otras opciones.\n\n\nMala imagen de marca: La frustración de quienes no logran contactarte afecta tu reputación.\n\n\nTiempo desperdiciado: Gestionar llamadas manualmente te quita horas que podrías dedicar a crecer tu negocio.\n\nSmartCalls resuelve estos problemas con una solución de voz con IA que atiende cada llamada 24/7, personaliza la interacción y convierte oportunidades en ventas, todo de forma automática. Ahorra hasta un 60% en costes operativos y mejora la satisfacción de tus clientes desde el primer contacto.\n\nNo permitas que tu negocio siga perdiendo terreno. Agenda una breve videollamada aquí https://calendar.app.google/2Lbbd3YhDA8cSDsV8 para descubrir cómo SmartCalls puede transformar tu atención telefónica. También puedes contactarnos directamente:\n\nSitio web: https://smartcalls.biz\nEmail: info@smartcalls.biz\nTel: +34 919 932 145\nTel: +1 332 232 7483\n\n¡Actúa ahora y convierte cada llamada en una oportunidad ganada!\n\nUn cordial saludo,\nEl equipo de SmartCalls",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -60,
+        -520
+      ],
+      "id": "0aee3551-e726-4342-9e5a-b3a8250d76ee",
+      "name": "Sin Contacto Email Resguardo",
+      "webhookId": "e1dbea9c-06bd-4f05-9263-bd5d5df944e2",
+      "credentials": {
+        "smtp": {
+          "id": "Dx9eTPsVTPlyb1CQ",
+          "name": "SMTP SmartCalls"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "fromEmail": "no-reply@smartcalls.biz",
+        "toEmail": "={{ $('Bucle Llamadas').item.json.email }}",
+        "subject": "Hemos intentado ponernos en contacto contigo - ¿Estás perdiendo clientes por no contestar?|",
+        "emailFormat": "text",
+        "text": "=Estimado {{ $('MySQL Tabla Customer').item.json.contact_name }},\n\nEl {{ $('FechaHora').item.json.fecha }} a las {{ $('FechaHora').item.json.hora }}, intentamos contactarte para presentarte SmartCalls, nuestra centralita con inteligencia artificial diseñada para que nunca más pierdas una oportunidad de negocio. No logramos hablar contigo, y esto podría ser una señal de que tu sistema actual de gestión de llamadas está dejando escapar clientes valiosos. \n\nCada llamada perdida es un cliente que se va con la competencia. ¿Sabías que el 80% de los consumidores no vuelve a contactar tras un intento fallido? Sin la tecnología adecuada, estás enfrentando:\n\n\nPérdida de ingresos: Clientes potenciales que no reciben respuesta y buscan otras opciones.\n\n\nMala imagen de marca: La frustración de quienes no logran contactarte afecta tu reputación.\n\n\nTiempo desperdiciado: Gestionar llamadas manualmente te quita horas que podrías dedicar a crecer tu negocio.\n\nSmartCalls resuelve estos problemas con una solución de voz con IA que atiende cada llamada 24/7, personaliza la interacción y convierte oportunidades en ventas, todo de forma automática. Ahorra hasta un 60% en costes operativos y mejora la satisfacción de tus clientes desde el primer contacto.\n\nNo permitas que tu negocio siga perdiendo terreno. Agenda una breve videollamada aquí https://calendar.app.google/2Lbbd3YhDA8cSDsV8 para descubrir cómo SmartCalls puede transformar tu atención telefónica. También puedes contactarnos directamente:\n\nSitio web: https://smartcalls.biz\nEmail: info@smartcalls.biz\nTel: +34 919 932 145\nTel: +1 332 232 7483\n\n¡Actúa ahora y convierte cada llamada en una oportunidad ganada!\n\nUn cordial saludo,\nEl equipo de SmartCalls",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -260,
+        -520
+      ],
+      "id": "e49e2469-0e5d-4110-a349-caa426b00ddb",
+      "name": "Sin Contacto Email Cliente",
+      "webhookId": "e1dbea9c-06bd-4f05-9263-bd5d5df944e2",
+      "credentials": {
+        "smtp": {
+          "id": "Dx9eTPsVTPlyb1CQ",
+          "name": "SMTP SmartCalls"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "fromEmail": "no-reply@smartcalls.biz",
+        "toEmail": "=info@smartcalls.biz",
+        "subject": "Hemos intentado ponernos en contacto contigo - ¿Estás perdiendo clientes por no contestar?|",
+        "emailFormat": "text",
+        "text": "=Estimado {{ $('MySQL Tabla Customer').item.json.contact_name }},\n\nEl {{ $('FechaHora').item.json.fecha }} a las {{ $('FechaHora').item.json.hora }}, intentamos contactarte para presentarte SmartCalls, nuestra centralita con inteligencia artificial diseñada para que nunca más pierdas una oportunidad de negocio. No logramos hablar contigo, y esto podría ser una señal de que tu sistema actual de gestión de llamadas está dejando escapar clientes valiosos. Escucha el extracto de nuestra llamada aquí {{ $('Ha acabado la llamada?').item.json.recording_url }} y descubre lo que pudo haber pasado desapercibido.\n\nCada llamada perdida es un cliente que se va con la competencia. ¿Sabías que el 80% de los consumidores no vuelve a contactar tras un intento fallido? Sin la tecnología adecuada, estás enfrentando:\n\n\nPérdida de ingresos: Clientes potenciales que no reciben respuesta y buscan otras opciones.\n\n\nMala imagen de marca: La frustración de quienes no logran contactarte afecta tu reputación.\n\n\nTiempo desperdiciado: Gestionar llamadas manualmente te quita horas que podrías dedicar a crecer tu negocio.\n\nSmartCalls resuelve estos problemas con una solución de voz con IA que atiende cada llamada 24/7, personaliza la interacción y convierte oportunidades en ventas, todo de forma automática. Ahorra hasta un 60% en costes operativos y mejora la satisfacción de tus clientes desde el primer contacto.\n\nNo permitas que tu negocio siga perdiendo terreno. Agenda una breve videollamada aquí https://calendar.app.google/2Lbbd3YhDA8cSDsV8 para descubrir cómo SmartCalls puede transformar tu atención telefónica. También puedes contactarnos directamente:\n\nSitio web: https://smartcalls.biz\nEmail: info@smartcalls.biz\nTel: +34 919 932 145\nTel: +1 332 232 7483\n\n¡Actúa ahora y convierte cada llamada en una oportunidad ganada!\n\nUn cordial saludo,\nEl equipo de SmartCalls",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -60,
+        -320
+      ],
+      "id": "2afd97d0-6edd-4980-9cd7-d28c987b24de",
+      "name": "Sin Contacto Email Resguardo3",
+      "webhookId": "e1dbea9c-06bd-4f05-9263-bd5d5df944e2",
+      "credentials": {
+        "smtp": {
+          "id": "Dx9eTPsVTPlyb1CQ",
+          "name": "SMTP SmartCalls"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "fromEmail": "no-reply@smartcalls.biz",
+        "toEmail": "={{ $('Bucle Llamadas').item.json.email }}",
+        "subject": "Hemos intentado ponernos en contacto contigo - ¿Estás perdiendo clientes por no contestar?|",
+        "emailFormat": "text",
+        "text": "=Estimado {{ $('MySQL Tabla Customer').item.json.contact_name }},\n\nEl {{ $('FechaHora').item.json.fecha }} a las {{ $('FechaHora').item.json.hora }}, intentamos contactarte para presentarte SmartCalls, nuestra centralita con inteligencia artificial diseñada para que nunca más pierdas una oportunidad de negocio. No logramos hablar contigo, y esto podría ser una señal de que tu sistema actual de gestión de llamadas está dejando escapar clientes valiosos. Escucha el extracto de nuestra llamada aquí {{ $('Ha acabado la llamada?').item.json.recording_url }} y descubre lo que pudo haber pasado desapercibido.\n\nCada llamada perdida es un cliente que se va con la competencia. ¿Sabías que el 80% de los consumidores no vuelve a contactar tras un intento fallido? Sin la tecnología adecuada, estás enfrentando:\n\n\nPérdida de ingresos: Clientes potenciales que no reciben respuesta y buscan otras opciones.\n\n\nMala imagen de marca: La frustración de quienes no logran contactarte afecta tu reputación.\n\n\nTiempo desperdiciado: Gestionar llamadas manualmente te quita horas que podrías dedicar a crecer tu negocio.\n\nSmartCalls resuelve estos problemas con una solución de voz con IA que atiende cada llamada 24/7, personaliza la interacción y convierte oportunidades en ventas, todo de forma automática. Ahorra hasta un 60% en costes operativos y mejora la satisfacción de tus clientes desde el primer contacto.\n\nNo permitas que tu negocio siga perdiendo terreno. Agenda una breve videollamada aquí https://calendar.app.google/2Lbbd3YhDA8cSDsV8 para descubrir cómo SmartCalls puede transformar tu atención telefónica. También puedes contactarnos directamente:\n\nSitio web: https://smartcalls.biz\nEmail: info@smartcalls.biz\nTel: +34 919 932 145\nTel: +1 332 232 7483\n\n¡Actúa ahora y convierte cada llamada en una oportunidad ganada!\n\nUn cordial saludo,\nEl equipo de SmartCalls",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -260,
+        -320
+      ],
+      "id": "72007d40-e50f-4ca5-b919-3d6db75ff30d",
+      "name": "Sin Contacto Email Cliente3",
+      "webhookId": "e1dbea9c-06bd-4f05-9263-bd5d5df944e2",
+      "credentials": {
+        "smtp": {
+          "id": "Dx9eTPsVTPlyb1CQ",
+          "name": "SMTP SmartCalls"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "# No se ha podido Contactar",
+        "height": 520,
+        "width": 800,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -320,
+        -620
+      ],
+      "typeVersion": 1,
+      "id": "6dd27ac8-a189-45c5-90c3-7124722c63a6",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# No ha Contestado",
+        "height": 80,
+        "width": 340,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        100,
+        -460
+      ],
+      "typeVersion": 1,
+      "id": "f9c4aa5f-a134-42f2-9a0a-b5e6e641bd4f",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "# Ha Contestado menos de 1,5 min",
+        "height": 120,
+        "width": 340,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        100,
+        -300
+      ],
+      "typeVersion": 1,
+      "id": "022ca769-a56a-45c2-a6f3-715e47908ade",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "# Verificar Evento\n\n",
+        "height": 340,
+        "width": 2060,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1300,
+        440
+      ],
+      "typeVersion": 1,
+      "id": "def95812-ba1d-4529-ab20-4397cba0fd02",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener el primer ítem del input\nconst item = $input.first().json;\n\n// Extraer el campo datetime\nconst datetime = item.datetime;\n\n// Dividir la cadena datetime en fecha y hora\nconst [fecha, hora] = datetime.split(' ');\n\n// Devolver el objeto con los campos separados\nreturn [{\n  json: {\n    fecha: fecha, // Ejemplo: \"2025-04-23\"\n    hora: hora,   // Ejemplo: \"18:04:02\"\n    datetime: datetime // Opcional: mantener el campo original\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1020,
+        200
+      ],
+      "id": "ba9340c5-b0df-4702-9527-e25e30eee704",
+      "name": "FechaHora",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6715a151-6f85-41da-9620-5e6127044822",
+              "leftValue": "={{ $json.continuar }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2540,
+        240
+      ],
+      "id": "24c2cdda-62ad-4fc7-b6df-4c4fdb6a7941",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "content": "## Parar de 22:0 a 9:00",
+        "height": 80,
+        "width": 280,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2700,
+        140
+      ],
+      "typeVersion": 1,
+      "id": "f1ae5694-2e38-48ef-9958-8e4d228af8c0",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -3520,
+        320
+      ],
+      "id": "55b4966f-0f74-4c32-bd76-86c3e90521fb",
+      "name": "Inicia a las 9:00 am"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM customer WHERE ORIGIN_ID = 5;",
+        "options": {}
+      },
+      "id": "c1838b62-4d87-42b5-b896-c5a00dec8fa6",
+      "name": "Total de Personas",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        -2920,
+        -60
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM customer WHERE ORIGIN_ID = 5 AND is_contacted = 0;",
+        "options": {}
+      },
+      "id": "a6878550-9622-413a-ac7b-5f6f753db75e",
+      "name": "Personas Sin Contactar",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        -2680,
+        -60
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM customer WHERE ORIGIN_ID = 5 AND call_attempts = 1;",
+        "options": {}
+      },
+      "id": "a42ca774-209b-4c72-bc4f-d76e9cfdb49d",
+      "name": "Personas a las que se les ha llamado una vez",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        -2280,
+        -60
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b0bfbae8-84c0-43a0-9783-96b02eeafec3",
+              "leftValue": "={{ $json.call_status }}",
+              "rightValue": "ended",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "4040b5d0-a4a0-4e52-b051-792888147b9f",
+              "leftValue": "={{ $json.call_status }}",
+              "rightValue": "error",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1340,
+        200
+      ],
+      "id": "8c3ff6de-41ac-47f0-8301-eb040959bca7",
+      "name": "Ha acabado la llamada?"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "table": {
+          "__rl": true,
+          "value": "customer",
+          "mode": "list",
+          "cachedResultName": "customer"
+        },
+        "dataMode": "defineBelow",
+        "columnToMatchOn": "place_id",
+        "valueToMatchOn": "={{ $('Bucle Llamadas').item.json.place_id }}",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "first_contact",
+              "value": "={{ $('DataTime').item.json.datetime }}"
+            },
+            {
+              "column": "last_contact",
+              "value": "={{ $('DataTime').item.json.datetime }}"
+            },
+            {
+              "column": "is_contacted",
+              "value": "1"
+            },
+            {
+              "column": "call_attempts",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8986bea9-e4f6-4b41-bfe6-aa210add7da3",
+      "name": "DB Customer (Llamada Realizada)",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        -640,
+        220
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM customer WHERE ORIGIN_ID = 5 AND is_contacted = 1;",
+        "options": {}
+      },
+      "id": "244f4b21-a7f0-4031-94ee-380d7de0ab20",
+      "name": "Personas que No han Constestado a la Llamada",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        -2480,
+        -60
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fd988e4e-98fb-438d-aab9-e2bcf703edea",
+              "leftValue": "={{ $json[\"phone\"].length }}",
+              "rightValue": 9,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2880,
+        240
+      ],
+      "id": "0b9dfff3-5f74-4078-ab12-9ba7d654c482",
+      "name": "Teléfono 9 dígitos",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "table": {
+          "__rl": true,
+          "value": "customer",
+          "mode": "list",
+          "cachedResultName": "customer"
+        },
+        "dataMode": "defineBelow",
+        "columnToMatchOn": "place_id",
+        "valueToMatchOn": "CUST-1745324319123",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "is_contacted",
+              "value": "1"
+            },
+            {
+              "column": "call_attempts",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7256a30d-2fde-4a96-86b3-54d8918d71e7",
+      "name": "Registrador",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        -2060,
+        -60
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM contactcustomer;",
+        "options": {}
+      },
+      "id": "e01af81f-194f-486f-87d5-8c7037f1cf43",
+      "name": "Buscador",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        -1840,
+        -60
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -3520,
+        140
+      ],
+      "id": "bf6740c4-5132-4f9c-bbfe-71ab9a32af5f",
+      "name": "Iniciar"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener hora actual en la zona horaria de Madrid\nconst now = new Date().toLocaleString('en-US', { timeZone: 'Europe/Madrid' });\nconst hora = new Date(now).getHours();\n\n// Si está entre las 10:00 y las 22:00, continuar\nif (hora >= 9 && hora < 22) {\n  return [{ json: { continuar: true } }];\n} else {\n  return []; // No devuelve nada => flujo se detiene\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2680,
+        240
+      ],
+      "id": "32e4b71d-bff5-43c2-a8b2-5937fe3de545",
+      "name": "Verificar Hora"
+    },
+    {
+      "parameters": {
+        "content": "# Contadores",
+        "height": 260,
+        "width": 1300,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2940,
+        -140
+      ],
+      "typeVersion": 1,
+      "id": "e4c5c865-3ac9-42ac-a407-4bf79a0c261f",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "## Registrador",
+        "height": 260,
+        "width": 210,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2080,
+        -140
+      ],
+      "typeVersion": 1,
+      "id": "1ae3912e-9f5e-494c-924b-2d4010cd8c28",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "content": "## Buscador",
+        "height": 260,
+        "width": 210,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1860,
+        -140
+      ],
+      "typeVersion": 1,
+      "id": "2553f4a8-09b6-4c63-9b9d-1c8ca5992cb5",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f951a14b-8a86-4cf9-bfee-643a0b8f0c4f",
+              "leftValue": "={{ $json.error.status }}",
+              "rightValue": 400,
+              "operator": {
+                "type": "number",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1800,
+        220
+      ],
+      "id": "87f96884-12bf-4a52-b329-29a39c62c36b",
+      "name": "Comprueba si status es igual a 400"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "table": {
+          "__rl": true,
+          "value": "customer",
+          "mode": "list",
+          "cachedResultName": "customer"
+        },
+        "dataMode": "defineBelow",
+        "columnToMatchOn": "place_id",
+        "valueToMatchOn": "={{ $json.place_id }}",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "extra_info",
+              "value": "error_phone"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e4c12155-bdd5-41ac-8cbe-c0010a43b589",
+      "name": "ErrorPhone",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        -3020,
+        440
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "table": {
+          "__rl": true,
+          "value": "customer",
+          "mode": "list",
+          "cachedResultName": "customer"
+        },
+        "dataMode": "defineBelow",
+        "columnToMatchOn": "place_id",
+        "valueToMatchOn": "={{ $('Bucle Llamadas').item.json.place_id }}",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "extra_info",
+              "value": "StatusError"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "30c6d741-3471-4a20-a5c3-52fa35571e3f",
+      "name": "Status 400",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        -1980,
+        460
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "table": {
+          "__rl": true,
+          "value": "customer",
+          "mode": "list",
+          "cachedResultName": "customer"
+        },
+        "dataMode": "defineBelow",
+        "columnToMatchOn": "place_id",
+        "valueToMatchOn": "={{ $('Bucle Llamadas').item.json.place_id }}",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "scheduled",
+              "value": "=1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5e255e19-a14c-40b5-96c2-e4c7ddc03719",
+      "name": "Scheduled",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        -900,
+        520
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "16435322-2f08-4433-9be0-be3176cedf0b",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1100,
+        540
+      ],
+      "id": "ed5ab15a-9a2a-4d86-b0f9-2676b3386063",
+      "name": "Error Reserva"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI2": {
+      "main": [
+        [
+          {
+            "node": "Llamada saliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL Tabla Customer": {
+      "main": [
+        [
+          {
+            "node": "Bucle Llamadas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Llamada saliente": {
+      "main": [
+        [
+          {
+            "node": "Comprueba si status es igual a 400",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcripción": {
+      "main": [
+        [
+          {
+            "node": "Ha acabado la llamada?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Espera": {
+      "main": [
+        [
+          {
+            "node": "Transcripción",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "El usuario ha respondido?": {
+      "main": [
+        [
+          {
+            "node": "DB Customer (Llamada no realizada)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DB Customer (Llamada Realizada)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB Customer (Llamada no realizada)": {
+      "main": [
+        [
+          {
+            "node": "Sin Contacto Email Cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DataTime": {
+      "main": [
+        [
+          {
+            "node": "FechaHora",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB Contactcustomer (Llamada Realizada)": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bucle Llamadas": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Teléfono 9 dígitos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar": {
+      "main": [
+        [
+          {
+            "node": "Error Reserva",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Correo Verificación Nuestro": {
+      "main": [
+        [
+          {
+            "node": "Correo Verificación Cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Correo Verificación Cliente": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Bucle Llamadas",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CodeFiltrarDatosCalendar": {
+      "main": [
+        [
+          {
+            "node": "CodeHora",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CodeHora": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Correo Verificación Nuestro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "CodeFiltrarDatosCalendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Sin Contacto Email Cliente3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Google Calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sin Contacto Email Resguardo": {
+      "main": [
+        [
+          {
+            "node": "Bucle Llamadas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sin Contacto Email Cliente": {
+      "main": [
+        [
+          {
+            "node": "Sin Contacto Email Resguardo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sin Contacto Email Resguardo3": {
+      "main": [
+        [
+          {
+            "node": "Bucle Llamadas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sin Contacto Email Cliente3": {
+      "main": [
+        [
+          {
+            "node": "Sin Contacto Email Resguardo3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FechaHora": {
+      "main": [
+        [
+          {
+            "node": "El usuario ha respondido?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "OpenAI2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Verificar Hora",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ha acabado la llamada?": {
+      "main": [
+        [
+          {
+            "node": "DataTime",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Espera",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inicia a las 9:00 am": {
+      "main": [
+        [
+          {
+            "node": "MySQL Tabla Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB Customer (Llamada Realizada)": {
+      "main": [
+        [
+          {
+            "node": "DB Contactcustomer (Llamada Realizada)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Teléfono 9 dígitos": {
+      "main": [
+        [
+          {
+            "node": "Verificar Hora",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ErrorPhone",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Iniciar": {
+      "main": [
+        [
+          {
+            "node": "MySQL Tabla Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar Hora": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Comprueba si status es igual a 400": {
+      "main": [
+        [
+          {
+            "node": "Transcripción",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Status 400",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ErrorPhone": {
+      "main": [
+        [
+          {
+            "node": "Bucle Llamadas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Status 400": {
+      "main": [
+        [
+          {
+            "node": "Bucle Llamadas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scheduled": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Reserva": {
+      "main": [
+        [
+          {
+            "node": "Scheduled",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Bucle Llamadas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Madrid",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "69f0d38b-8711-4ba4-821e-1769e7ac76c1",
+  "meta": {
+    "instanceId": "91e9bc2fd2d08736422cccee7e1506bda336e368f82dcb792c9d1bbf6348503c"
+  },
+  "id": "VaYx0dRSjZrWveuN",
+  "tags": []
+}

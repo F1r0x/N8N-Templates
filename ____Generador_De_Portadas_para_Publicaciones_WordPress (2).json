@@ -1,0 +1,203 @@
+{
+  "name": "✅🔵 Generador De Portadas para Publicaciones WordPress",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "=\"Generate an image for my next blog post, without text. Image description: A realistic scene inspired by '{{ $json.promp }}', with high-quality detail.\"\n",
+        "options": {
+          "quality": "hd",
+          "size": "1024x1024",
+          "style": "natural"
+        }
+      },
+      "id": "704c80dd-8140-4ed2-af17-09da4c145c3b",
+      "name": "Generate image",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        -420,
+        500
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://optimaquantum.com/wp-json/wp/v2/media",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "wordpressApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "alt_text",
+              "value": "={{ $('Inicio').item.json.promp }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Disposition",
+              "value": "=attachment; filename=\"copertina-{{ $('Inicio').item.json.id }}.jpg\""
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "id": "b69fd526-749e-4cd4-8ce0-028b7907a88d",
+      "name": "Update Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -220,
+        500
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "wordpressApi": {
+          "id": "teUGGLMVTYrw7lVa",
+          "name": "Wordpress Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://optimaquantum.com/wp-json/wp/v2/posts/{{ $('Inicio').item.json.id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "wordpressApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "featured_media",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "31cc09e5-d682-4fb5-bdfd-d29e53bd420f",
+      "name": "Post Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -20,
+        500
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "wordpressApi": {
+          "id": "teUGGLMVTYrw7lVa",
+          "name": "Wordpress Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Generar y publicar Imagen",
+        "height": 220,
+        "width": 580,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -460,
+        440
+      ],
+      "typeVersion": 1,
+      "id": "219155d5-2fd7-4fc3-bad8-c13cba9bbb7e",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "## Introduce los siguientes datos:\n\n1- **Título Artículo o Promp**\n\n2- **ID pulicación Wordpress** \n\n",
+        "height": 340,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -700,
+        320
+      ],
+      "typeVersion": 1,
+      "id": "93902922-7bf0-4905-bf05-f72bec07cd37",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        500
+      ],
+      "id": "9b4fed7c-9379-4ce6-9e56-3d32f20061e6",
+      "name": "Inicio"
+    }
+  ],
+  "pinData": {
+    "Inicio": [
+      {
+        "json": {
+          "promp": "IA transforma ciberseguridad: gestión de identidades segura",
+          "id": 2247
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Generate image": {
+      "main": [
+        [
+          {
+            "node": "Update Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Image": {
+      "main": [
+        [
+          {
+            "node": "Post Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inicio": {
+      "main": [
+        [
+          {
+            "node": "Generate image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e231861a-a306-446c-b77e-8b98b9ce1c48",
+  "meta": {
+    "instanceId": "91e9bc2fd2d08736422cccee7e1506bda336e368f82dcb792c9d1bbf6348503c"
+  },
+  "id": "3DdOhTWDcCRFwt9D",
+  "tags": []
+}

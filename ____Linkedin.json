@@ -1,0 +1,451 @@
+{
+  "name": "✅🛠 Linkedin",
+  "nodes": [
+    {
+      "parameters": {
+        "person": "FYEKbbaqnr",
+        "text": "={{ $('Generador de Contenido').item.json.output.linkedin }}",
+        "shareMediaCategory": "IMAGE",
+        "additionalFields": {}
+      },
+      "id": "09be819b-61a8-435a-b203-f48280a3eadf",
+      "name": "Publish on LinkedIn",
+      "type": "n8n-nodes-base.linkedIn",
+      "position": [
+        680,
+        0
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "W7ANaf0syZbnP0ex",
+          "name": "LinkedIn Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        180,
+        100
+      ],
+      "id": "cbaef776-e22c-4ffa-bcf2-3369d0dce7af",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "83e06728-6adb-4589-88d8-32a762b5c063",
+      "name": "Iniciar",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -160,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "postId": "={{ $json.ID }}",
+        "options": {}
+      },
+      "id": "3a45e726-b930-44ba-8595-5ba46c59c140",
+      "name": "Descargar Artículo WordPress",
+      "type": "n8n-nodes-base.wordpress",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "wordpressApi": {
+          "id": "teUGGLMVTYrw7lVa",
+          "name": "Wordpress Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "={{ $json.output.facebook }}",
+        "options": {
+          "size": "1792x1024",
+          "returnImageUrls": false
+        }
+      },
+      "id": "06c9eef6-f76b-494a-a708-2e71799ae10c",
+      "name": "Image Linkedin",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        520,
+        0
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        160,
+        -380
+      ],
+      "id": "03a6e9a2-88a4-4986-bf66-11fec9597dd5",
+      "name": "Loop Over Items",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "62722de1-5504-42b1-b58c-a1a99d64ca1d",
+              "name": "ID",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "77655a78-994b-427c-bc08-394965733e50",
+              "name": "Title",
+              "value": "={{ $json.title.rendered }}",
+              "type": "string"
+            },
+            {
+              "id": "02bc8a47-2a11-4585-8af3-e0f0d073fa4e",
+              "name": "Date",
+              "value": "={{ $json.date }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        420,
+        -360
+      ],
+      "id": "78ec0820-81d1-4147-947b-85307321286d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648",
+          "mode": "list",
+          "cachedResultName": "Visualizador de Datos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2073865692,
+          "mode": "list",
+          "cachedResultName": "Publicaciones Wordpress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648/edit#gid=2073865692"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json.ID }}",
+            "Titulo": "={{ $json.Title }}",
+            "Fecha": "={{ $json.Date }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Titulo",
+              "displayName": "Titulo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        660,
+        -360
+      ],
+      "id": "6d11b04d-bc72-43f3-9850-950743e478e0",
+      "name": "Guardar Número de Publicaciones",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate social content from the following text with title \"{{ $json.title.rendered }}\" (in the same language):\n\n'''\n{{ $json.content.rendered }}\n'''",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "==Generate social content from the following text with title \"{{ $json.title.rendered }}\" (in the same language):\n\n'''\n{{ $json.content.rendered }}\n'''"
+            }
+          ]
+        }
+      },
+      "id": "d381b76b-e69e-4898-9b45-7b26c699bb40",
+      "name": "Generador de Contenido",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        180,
+        -40
+      ],
+      "typeVersion": 1.5
+    },
+    {
+      "parameters": {
+        "content": "## Recopilar ID de publicación de los Artículos de WordPress\n",
+        "height": 340,
+        "width": 1060,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -200,
+        -480
+      ],
+      "typeVersion": 1,
+      "id": "fc1e7bb4-1d04-4b2e-96f3-309d3e03794e",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "url": "https://optimaquantum.com/wp-json/wp/v2/posts?per_page=100&page=1",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -80,
+        -380
+      ],
+      "id": "74025e23-d8ad-4cd9-beb8-2000e5f8b126",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "content": "## Recopilar ID de publicación de los Artículos de WordPress\n",
+        "height": 340,
+        "width": 1060,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -200,
+        -120
+      ],
+      "typeVersion": 1,
+      "id": "bf3fc031-46c1-461c-984e-c5ffb6e99451",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"twitter\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"facebook\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n        \"linkedin\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n        \"instagram\": {\n\t\t\t\"type\": \"string\"\n\t\t}\n\t}\n}"
+      },
+      "id": "4007f392-a72a-46c8-8c7d-d1e9fbdcbc5a",
+      "name": "Structured Output",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        360,
+        100
+      ],
+      "typeVersion": 1.2
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Publish on LinkedIn": {
+      "main": [
+        []
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generador de Contenido",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Iniciar": {
+      "main": [
+        [
+          {
+            "node": "Descargar Artículo WordPress",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Descargar Artículo WordPress": {
+      "main": [
+        [
+          {
+            "node": "Generador de Contenido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Linkedin": {
+      "main": [
+        [
+          {
+            "node": "Publish on LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Guardar Número de Publicaciones",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Número de Publicaciones": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generador de Contenido": {
+      "main": [
+        [
+          {
+            "node": "Image Linkedin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Generador de Contenido",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2fda52bd-41e0-4383-b232-51e20f5639bd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "91e9bc2fd2d08736422cccee7e1506bda336e368f82dcb792c9d1bbf6348503c"
+  },
+  "id": "A88RPQ2aQIL4U9ek",
+  "tags": []
+}
