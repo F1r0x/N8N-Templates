@@ -1,0 +1,659 @@
+{
+  "name": "[+] Recon",
+  "nodes": [
+    {
+      "parameters": {
+        "command": "=ping -c 4 8.8.8.8"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        -624
+      ],
+      "id": "96d50e7c-797f-4cf6-8e97-ef7b033c1412",
+      "name": "Ping",
+      "credentials": {
+        "sshPassword": {
+          "id": "Ej1nuQWQEfdEacKe",
+          "name": "Kali Linux"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener el stdout del nodo anterior (Execute Command)\nconst pingOutput = items[0].json.stdout;\n\nif (!pingOutput) {\n  throw new Error(\"No se pudo obtener la salida del ping.\");\n}\n\n// Comprobar paquetes recibidos\nconst receivedMatch = pingOutput.match(/(\\d+)\\s+received/);\nconst lossMatch = pingOutput.match(/(\\d+)%\\s+packet loss/);\n\nconst receivedPackets = receivedMatch ? parseInt(receivedMatch[1], 10) : 0;\nconst packetLoss = lossMatch ? parseInt(lossMatch[1], 10) : 100;\n\n// Lógica de conexión\nconst hasConnection = receivedPackets > 0 && packetLoss < 100;\n\nif (!hasConnection) {\n  throw new Error(\"❌ Sin conexión a Internet. Escaneos cancelados.\");\n}\n\n// Opcional: añadir flag al workflow\nitems[0].json.hasInternetConnection = true;\n\n// Continuar workflow\nreturn items;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -432,
+        -624
+      ],
+      "id": "15174808-3982-4df2-979c-aeebf6ec14bd",
+      "name": "Prueba de Conexión"
+    },
+    {
+      "parameters": {
+        "command": "=nmap --open -p- -T5 -n -vvv {{ $json.IP }}"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -624
+      ],
+      "id": "ad3d4496-054c-4091-8c39-2af19b5f79e9",
+      "name": "Nmap",
+      "retryOnFail": false,
+      "waitBetweenTries": 3000,
+      "maxTries": 5,
+      "alwaysOutputData": false,
+      "credentials": {
+        "sshPassword": {
+          "id": "Ej1nuQWQEfdEacKe",
+          "name": "Kali Linux"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "=sudo /usr/sbin/openvpn \\\n  --config /home/firox/HackTheBox/VPN/lab_TheF1r0x.ovpn \\\n  --daemon \\\n  --log /tmp/htb_vpn.log\n"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        -704,
+        -208
+      ],
+      "id": "4e6c2eb3-14f3-4005-b3f2-4e5f166df6f5",
+      "name": "OpenVPN",
+      "credentials": {
+        "sshPassword": {
+          "id": "Ej1nuQWQEfdEacKe",
+          "name": "Kali Linux"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = $json.stdout;\n\n// Extraer IP\nconst ipMatch = output.match(/\\d{1,3}(\\.\\d{1,3}){3}/);\nconst ip_address = ipMatch ? ipMatch[0] : \"Unknown\";\n\n// Extraer puertos abiertos\nconst ports = [...output.matchAll(/(\\d{1,5})\\/tcp\\s+open/g)]\n  .map(match => match[1]);\n\nreturn [{\n  ip_address,\n  open_ports: ports,\n  ports_string: ports.join(','),\n  port_count: ports.length\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        -624
+      ],
+      "id": "0e3c878f-03d8-4eef-8e3d-5d60b40e58d2",
+      "name": "Filtrar Puertos"
+    },
+    {
+      "parameters": {
+        "jsCode": "const stdout = $json.stdout;\n\n// Regex para extraer IP\nconst match = stdout.match(/inet\\s+(\\d+\\.\\d+\\.\\d+\\.\\d+)/);\n\nif (!match) {\n  throw new Error('No se pudo extraer la IP de tun0');\n}\n\nreturn [\n  {\n    vpn_ip: match[1]\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        -432
+      ],
+      "id": "ebdad08e-ff1e-4aa8-891c-76be188a888b",
+      "name": "Filtrar IP VPN"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -784,
+        -624
+      ],
+      "id": "07420d20-9574-41ef-b934-21b4cc96af91",
+      "name": "Iniciar"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ff0ec028-e99e-4868-97cf-a11e9da173b9",
+              "leftValue": "={{ $json.stdout }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -608,
+        -416
+      ],
+      "id": "4b4ba350-668c-4efc-af55-8c1a72264e5c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "command": "=ip a | grep tun\n"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        -768,
+        -416
+      ],
+      "id": "1001925f-f671-4fae-927a-e1b4b919bfbd",
+      "name": "Conexión VPN",
+      "credentials": {
+        "sshPassword": {
+          "id": "Ej1nuQWQEfdEacKe",
+          "name": "Kali Linux"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "=ping -c 4 {{ $('Iniciar').item.json.IP }}"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        -432
+      ],
+      "id": "267f4ae0-f3d0-4cc7-bde0-59cbb5f7a3ad",
+      "name": "Ping Víctima",
+      "credentials": {
+        "sshPassword": {
+          "id": "Ej1nuQWQEfdEacKe",
+          "name": "Kali Linux"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener el stdout del nodo anterior (Execute Command)\nconst pingOutput = items[0].json.stdout;\n\nif (!pingOutput) {\n  throw new Error(\"No se pudo obtener la salida del ping.\");\n}\n\n// Comprobar paquetes recibidos\nconst receivedMatch = pingOutput.match(/(\\d+)\\s+received/);\nconst lossMatch = pingOutput.match(/(\\d+)%\\s+packet loss/);\n\nconst receivedPackets = receivedMatch ? parseInt(receivedMatch[1], 10) : 0;\nconst packetLoss = lossMatch ? parseInt(lossMatch[1], 10) : 100;\n\n// Lógica de conexión\nconst hasConnection = receivedPackets > 0 && packetLoss < 100;\n\nif (!hasConnection) {\n  throw new Error(\"❌ Sin conexión a Internet. Escaneos cancelados.\");\n}\n\n// Opcional: añadir flag al workflow\nitems[0].json.hasInternetConnection = true;\n\n// Continuar workflow\nreturn items;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32,
+        -432
+      ],
+      "id": "536ad754-1246-4da6-9f70-9cbab2a868f0",
+      "name": "Prueba de Conexión IP Víctima",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3494d1ee-383d-4570-bc38-b142bac220a3",
+              "name": "IP",
+              "value": "={{ $('Iniciar').item.json.IP }}",
+              "type": "string"
+            },
+            {
+              "id": "7f36e3dd-a687-43bf-b820-280324824dda",
+              "name": "Nombre de la Máquina",
+              "value": "={{ $('Iniciar').item.json[\"Nombre de la Máquina\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "97b6c247-020e-44c5-b04f-20edfdf77fb5",
+              "name": "vpn_ip",
+              "value": "={{ $('Filtrar IP VPN').item.json.vpn_ip }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        272,
+        -624
+      ],
+      "id": "39f570d0-cd6d-4ca5-9d49-8ba1bf9c4747",
+      "name": "Info"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "97b6c247-020e-44c5-b04f-20edfdf77fb5",
+              "name": "IP VPN",
+              "value": "={{ $('Filtrar IP VPN').item.json.vpn_ip }}",
+              "type": "string"
+            },
+            {
+              "id": "3494d1ee-383d-4570-bc38-b142bac220a3",
+              "name": "IP Máquina Víctima",
+              "value": "={{ $('Iniciar').item.json.IP }}",
+              "type": "string"
+            },
+            {
+              "id": "7f36e3dd-a687-43bf-b820-280324824dda",
+              "name": "Nombre de la Máquina",
+              "value": "={{ $('Iniciar').item.json[\"Nombre de la Máquina\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "d4c53ed7-cb69-46db-b5ae-1015a0dddecf",
+              "name": "Puertos Abiertos",
+              "value": "={{ $json.ports_string }}",
+              "type": "string"
+            },
+            {
+              "id": "746c8272-ddd2-4d79-9eaf-635202abb0eb",
+              "name": "Número de Puertos",
+              "value": "={{ $json.port_count }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        800,
+        -624
+      ],
+      "id": "0218b916-6de0-4240-aa9c-3adb148b26bb",
+      "name": "Info Scan"
+    },
+    {
+      "parameters": {
+        "command": "=nmap -sC -sV -n -vvv -p {{ $json[\"Puertos Abiertos\"] }} {{ $json[\"IP Máquina Víctima\"] }}"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        464,
+        -432
+      ],
+      "id": "9767cd39-f947-468c-8181-1d34e033edfd",
+      "name": "Enumeración de Servicios",
+      "retryOnFail": false,
+      "waitBetweenTries": 3000,
+      "maxTries": 5,
+      "alwaysOutputData": false,
+      "credentials": {
+        "sshPassword": {
+          "id": "Ej1nuQWQEfdEacKe",
+          "name": "Kali Linux"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = $json.stdout;\n\n// IP\nconst ip = output.match(/\\d{1,3}(\\.\\d{1,3}){3}/)?.[0] ?? \"N/A\";\n\n// Puertos\nconst ports = [...output.matchAll(/(\\d{1,5})\\/tcp\\s+open\\s+([\\w\\-\\?]+)\\s*(.*)?/g)]\n  .map(p => ({\n    port: p[1],\n    service: p[2],\n    version: p[3]?.trim() || \"Unknown\"\n  }));\n\n// n8n detectado\nconst n8nDetected = output.includes(\"n8n@\");\nconst n8nVersion = output.match(/n8n@([\\d\\.]+)/)?.[1] ?? \"Unknown\";\n\nreturn [{\n  ip,\n  ports,\n  n8nDetected,\n  n8nVersion,\n  date: new Date().toLocaleString()\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        -432
+      ],
+      "id": "938d3243-6f1e-4dc8-9fe1-991fe7a4feab",
+      "name": "Filtar Escaneo"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "97b6c247-020e-44c5-b04f-20edfdf77fb5",
+              "name": "IP VPN",
+              "value": "={{ $('Filtrar IP VPN').item.json.vpn_ip }}",
+              "type": "string"
+            },
+            {
+              "id": "3494d1ee-383d-4570-bc38-b142bac220a3",
+              "name": "IP Máquina Víctima",
+              "value": "={{ $('Iniciar').item.json.IP }}",
+              "type": "string"
+            },
+            {
+              "id": "7f36e3dd-a687-43bf-b820-280324824dda",
+              "name": "Nombre de la Máquina",
+              "value": "={{ $('Iniciar').item.json[\"Nombre de la Máquina\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "d4c53ed7-cb69-46db-b5ae-1015a0dddecf",
+              "name": "Puertos Abiertos",
+              "value": "={{ $('Info Scan').item.json[\"Puertos Abiertos\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "746c8272-ddd2-4d79-9eaf-635202abb0eb",
+              "name": "Número de Puertos",
+              "value": "={{ $('Info Scan').item.json[\"Número de Puertos\"] }}",
+              "type": "number"
+            },
+            {
+              "id": "da9f585b-60c6-4a1c-aa79-0d04c7eb384a",
+              "name": "Servicios Expuestos",
+              "value": "={{ $json.ports }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        800,
+        -432
+      ],
+      "id": "89326378-aaa7-4654-8c69-0e45c6b04bbd",
+      "name": "Info Scan1"
+    },
+    {
+      "parameters": {
+        "content": "## Prueba de Conexión con VPN\n\n",
+        "height": 80,
+        "width": 944,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -800,
+        -752
+      ],
+      "typeVersion": 1,
+      "id": "ff77a650-ac39-45d8-8411-8f1b6baa591c",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -176,
+        -208
+      ],
+      "id": "18d95150-8763-477b-8618-4dcc01223154",
+      "name": "Wait",
+      "webhookId": "c9f1827b-4db9-4085-8385-0e0e88d7853e"
+    },
+    {
+      "parameters": {
+        "content": "## Reconocimiento con NMAP\n\n",
+        "height": 80,
+        "width": 768,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        224,
+        -752
+      ],
+      "typeVersion": 1,
+      "id": "1a3dcd0e-c879-4bc2-9d22-424fb1b058f5",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {
+    "Iniciar": [
+      {
+        "json": {
+          "Nombre de la Máquina": "Conversor",
+          "IP": "10.10.11.92",
+          "submittedAt": "2025-12-25T21:16:40.154-05:00",
+          "formMode": "test"
+        }
+      }
+    ],
+    "Nmap": [
+      {
+        "json": {
+          "code": 0,
+          "signal": null,
+          "stdout": "Starting Nmap 7.98 ( https://nmap.org ) at 2025-12-26 03:50 +0100\nInitiating Ping Scan at 03:50\nScanning 10.10.11.92 [4 ports]\nCompleted Ping Scan at 03:50, 0.16s elapsed (1 total hosts)\nInitiating SYN Stealth Scan at 03:50\nScanning 10.10.11.92 [65535 ports]\nDiscovered open port 22/tcp on 10.10.11.92\nDiscovered open port 80/tcp on 10.10.11.92\nSYN Stealth Scan Timing: About 58.16% done; ETC: 03:51 (0:00:30 remaining)\nSYN Stealth Scan Timing: About 58.29% done; ETC: 03:52 (0:00:52 remaining)\nSYN Stealth Scan Timing: About 58.42% done; ETC: 03:53 (0:01:13 remaining)\nSYN Stealth Scan Timing: About 58.55% done; ETC: 03:54 (0:01:33 remaining)\nCompleted SYN Stealth Scan at 03:53, 169.17s elapsed (65535 total ports)\nNmap scan report for 10.10.11.92\nHost is up, received reset ttl 63 (0.13s latency).\nScanned at 2025-12-26 03:50:18 CET for 170s\nNot shown: 63353 closed tcp ports (reset), 2180 filtered tcp ports (no-response)\nSome closed ports may be reported as filtered due to --defeat-rst-ratelimit\nPORT   STATE SERVICE REASON\n22/tcp open  ssh     syn-ack ttl 63\n80/tcp open  http    syn-ack ttl 63\n\nRead data files from: /usr/share/nmap\nNmap done: 1 IP address (1 host up) scanned in 169.43 seconds\n           Raw packets sent: 79203 (3.485MB) | Rcvd: 73430 (2.937MB)",
+          "stderr": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Enumeración de Servicios": [
+      {
+        "json": {
+          "code": 0,
+          "signal": null,
+          "stdout": "Starting Nmap 7.98 ( https://nmap.org ) at 2025-12-26 03:57 +0100\nNSE: Loaded 158 scripts for scanning.\nNSE: Script Pre-scanning.\nNSE: Starting runlevel 1 (of 3) scan.\nInitiating NSE at 03:57\nCompleted NSE at 03:57, 0.00s elapsed\nNSE: Starting runlevel 2 (of 3) scan.\nInitiating NSE at 03:57\nCompleted NSE at 03:57, 0.00s elapsed\nNSE: Starting runlevel 3 (of 3) scan.\nInitiating NSE at 03:57\nCompleted NSE at 03:57, 0.00s elapsed\nInitiating Ping Scan at 03:57\nScanning 10.10.11.92 [4 ports]\nCompleted Ping Scan at 03:57, 0.16s elapsed (1 total hosts)\nInitiating SYN Stealth Scan at 03:57\nScanning 10.10.11.92 [2 ports]\nDiscovered open port 80/tcp on 10.10.11.92\nDiscovered open port 22/tcp on 10.10.11.92\nCompleted SYN Stealth Scan at 03:57, 0.15s elapsed (2 total ports)\nInitiating Service scan at 03:57\nScanning 2 services on 10.10.11.92\nCompleted Service scan at 03:58, 6.28s elapsed (2 services on 1 host)\nNSE: Script scanning 10.10.11.92.\nNSE: Starting runlevel 1 (of 3) scan.\nInitiating NSE at 03:58\nCompleted NSE at 03:58, 3.48s elapsed\nNSE: Starting runlevel 2 (of 3) scan.\nInitiating NSE at 03:58\nCompleted NSE at 03:58, 0.51s elapsed\nNSE: Starting runlevel 3 (of 3) scan.\nInitiating NSE at 03:58\nCompleted NSE at 03:58, 0.00s elapsed\nNmap scan report for 10.10.11.92\nHost is up, received echo-reply ttl 63 (0.13s latency).\nScanned at 2025-12-26 03:57:59 CET for 11s\n\nPORT   STATE SERVICE REASON         VERSION\n22/tcp open  ssh     syn-ack ttl 63 OpenSSH 8.9p1 Ubuntu 3ubuntu0.13 (Ubuntu Linux; protocol 2.0)\n| ssh-hostkey: \n|   256 01:74:26:39:47:bc:6a:e2:cb:12:8b:71:84:9c:f8:5a (ECDSA)\n| ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJ9JqBn+xSQHg4I+jiEo+FiiRUhIRrVFyvZWz1pynUb/txOEximgV3lqjMSYxeV/9hieOFZewt/ACQbPhbR/oaE=\n|   256 3a:16:90:dc:74:d8:e3:c4:51:36:e2:08:06:26:17:ee (ED25519)\n|_ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIR1sFcTPihpLp0OemLScFRf8nSrybmPGzOs83oKikw+\n80/tcp open  http    syn-ack ttl 63 Apache httpd 2.4.52\n| http-methods: \n|_  Supported Methods: GET HEAD POST OPTIONS\n|_http-server-header: Apache/2.4.52 (Ubuntu)\n|_http-title: Did not follow redirect to http://conversor.htb/\nService Info: Host: conversor.htb; OS: Linux; CPE: cpe:/o:linux:linux_kernel\n\nNSE: Script Post-scanning.\nNSE: Starting runlevel 1 (of 3) scan.\nInitiating NSE at 03:58\nCompleted NSE at 03:58, 0.00s elapsed\nNSE: Starting runlevel 2 (of 3) scan.\nInitiating NSE at 03:58\nCompleted NSE at 03:58, 0.00s elapsed\nNSE: Starting runlevel 3 (of 3) scan.\nInitiating NSE at 03:58\nCompleted NSE at 03:58, 0.00s elapsed\nRead data files from: /usr/share/nmap\nService detection performed. Please report any incorrect results at https://nmap.org/submit/ .\nNmap done: 1 IP address (1 host up) scanned in 11.04 seconds\n           Raw packets sent: 6 (240B) | Rcvd: 3 (116B)",
+          "stderr": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Ping": {
+      "main": [
+        [
+          {
+            "node": "Prueba de Conexión",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prueba de Conexión": {
+      "main": [
+        [
+          {
+            "node": "Conexión VPN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenVPN": {
+      "main": [
+        [
+          {
+            "node": "Conexión VPN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nmap": {
+      "main": [
+        [
+          {
+            "node": "Filtrar Puertos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrar IP VPN": {
+      "main": [
+        [
+          {
+            "node": "Ping Víctima",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Iniciar": {
+      "main": [
+        [
+          {
+            "node": "Ping",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Conexión VPN": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Filtrar IP VPN",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OpenVPN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ping Víctima": {
+      "main": [
+        [
+          {
+            "node": "Prueba de Conexión IP Víctima",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prueba de Conexión IP Víctima": {
+      "main": [
+        [
+          {
+            "node": "Info",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Info": {
+      "main": [
+        [
+          {
+            "node": "Nmap",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrar Puertos": {
+      "main": [
+        [
+          {
+            "node": "Info Scan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Info Scan": {
+      "main": [
+        [
+          {
+            "node": "Enumeración de Servicios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enumeración de Servicios": {
+      "main": [
+        [
+          {
+            "node": "Filtar Escaneo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtar Escaneo": {
+      "main": [
+        [
+          {
+            "node": "Info Scan1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Conexión VPN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "77d68177-28ae-442d-82d1-9df298169c0d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4960f7bea9fd01b0ba22182b2cd771e0e1d26260728e842ae963862943e141e0"
+  },
+  "id": "I0NxL0fmj2rufUea",
+  "tags": []
+}
