@@ -1,0 +1,67 @@
+{
+  "name": "send-mail-tester",
+  "nodes": [
+    {
+      "parameters": {
+        "fromEmail": "no-reply@smartcalls.biz",
+        "toEmail": "=lalexl333games@gmail.com",
+        "subject": "Hemos intentado ponernos en contacto contigo - ¿Estás perdiendo clientes por no contestar?|",
+        "html": "=<p>Estimado Alex,</p>\n\n<p>El  a las , intentamos contactarte para presentarte SmartCalls, nuestra centralita con inteligencia artificial diseñada para que nunca más pierdas una oportunidad de negocio. No logramos hablar contigo, y esto podría ser una señal de que tu sistema actual de gestión de llamadas está dejando escapar clientes valiosos.</p> \n\n<p>Cada llamada perdida es un cliente que se va con la competencia. ¿Sabías que el 80% de los consumidores no vuelve a contactar tras un intento fallido? Sin la tecnología adecuada, estás enfrentando:</p>\n\n\n<p>Pérdida de ingresos: Clientes potenciales que no reciben respuesta y buscan otras opciones.</p>\n\n\n<p>Mala imagen de marca: La frustración de quienes no logran contactarte afecta tu reputación.</p>\n\n\n<p>Tiempo desperdiciado: Gestionar llamadas manualmente te quita horas que podrías dedicar a crecer tu negocio.</p>\n\n<p>SmartCalls resuelve estos problemas con una solución de voz con IA que atiende cada llamada 24/7, personaliza la interacción y convierte oportunidades en ventas, todo de forma automática. Ahorra hasta un 60% en costes operativos y mejora la satisfacción de tus clientes desde el primer contacto.</p>\n\n<p>No permitas que tu negocio siga perdiendo terreno. Agenda una breve videollamada aquí https://calendar.app.google/2Lbbd3YhDA8cSDsV8 para descubrir cómo SmartCalls puede transformar tu atención telefónica. También puedes contactarnos directamente:</p>\n\n<p>Sitio web: https://smartcalls.biz</p>\n<p>Email: info@smartcalls.biz</p>\n<p>Tel: +34 919 932 145</p>\n<p>Tel: +1 332 232 7483</p>\n\n<p>¡Actúa ahora y convierte cada llamada en una oportunidad ganada!</p>\n\n<p>Un cordial saludo,</p>\n<p>El equipo de SmartCalls</p>\n\n<img src=\"pixel.smartcalls.biz/track/Cust-123\" width=\"1\" height=\"1\" style=\"display:none;\" />",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        128,
+        -80
+      ],
+      "id": "2596ce20-3407-4a14-9ee9-4d9e726a0891",
+      "name": "Sin Contacto Email Cliente",
+      "webhookId": "e1dbea9c-06bd-4f05-9263-bd5d5df944e2",
+      "credentials": {
+        "smtp": {
+          "id": "Dx9eTPsVTPlyb1CQ",
+          "name": "SMTP SmartCalls"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        -80
+      ],
+      "id": "1639f3fb-abea-4c9f-80ce-c396a6609e08",
+      "name": "When clicking ‘Test workflow’"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Sin Contacto Email Cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a922c1f9-5346-4da2-a5e7-7269e88789aa",
+  "meta": {
+    "instanceId": "91e9bc2fd2d08736422cccee7e1506bda336e368f82dcb792c9d1bbf6348503c"
+  },
+  "id": "CXQTMDPbf83bewf5",
+  "tags": []
+}

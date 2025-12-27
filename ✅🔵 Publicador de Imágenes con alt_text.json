@@ -1,0 +1,498 @@
+{
+  "name": "✅🔵 Publicador de Imágenes con alt_text",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        48
+      ],
+      "id": "33af1a6e-445d-4766-bc56-39ca7fbabf2b",
+      "name": "Inicio"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fdc852c7-fd30-468c-8c1c-64739e6377f5",
+              "name": "postID",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "53824da1-644f-4790-bcfa-9eab911bc396",
+              "name": "keyPhrase",
+              "value": "={{ $json.promp }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -208,
+        48
+      ],
+      "id": "9dbaedd5-d799-4aee-a02f-d9fab72e7cff",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=o3-mini",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Traduceme el siguiente texto al Inglés \"{{ $('Edit Fields').item.json.keyPhrase }}\" "
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d52582cd-a186-49e9-9f17-4c7e40b6c6af",
+      "name": "Traductor",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        -64,
+        -240
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "=\"Generate an image for my next blog post, without text. Image description: A realistic scene inspired by '{{ $('Traductor').item.json.message.content }}', with high-quality detail.\"",
+        "options": {
+          "size": "1024x1024",
+          "style": "natural"
+        }
+      },
+      "id": "06927f15-4eff-42e4-abcf-336a5bbffce8",
+      "name": "generarSegundaImg",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        112,
+        -240
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://optimaquantum.com/wp-json/wp/v2/media",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "wordpressApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "alt_text",
+              "value": "={{ $('Edit Fields').item.json.keyPhrase }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Disposition",
+              "value": "=attachment; filename=\"secondary1-{{ $('Edit Fields').item.json.postID }}.jpg\""
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "id": "29f797a4-67b2-413f-ad11-4f94e2566178",
+      "name": "subirSegundaIMG1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        320,
+        -160
+      ],
+      "credentials": {
+        "wordpressApi": {
+          "id": "teUGGLMVTYrw7lVa",
+          "name": "Wordpress Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "=\"Generate an image for my next blog post. That the image does not contain text. Image description: A realistic scene inspired by '{{ $('Traductor').item.json.message.content }}'\"",
+        "options": {
+          "size": "1024x1024",
+          "style": "natural"
+        }
+      },
+      "id": "ee2aba43-b19f-45e4-87ef-2a211b1df94d",
+      "name": "generarTerceraImg",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        528,
+        -160
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://optimaquantum.com/wp-json/wp/v2/media",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "wordpressApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "alt_text",
+              "value": "={{ $('Edit Fields').item.json.keyPhrase }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Disposition",
+              "value": "=attachment; filename=\"secondary2-{{ $('Edit Fields').item.json.postID }}.jpg\""
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "id": "81d01d47-d99c-4c69-a114-35d1dbbdad0f",
+      "name": "subirTerceraIMG1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        128,
+        48
+      ],
+      "credentials": {
+        "wordpressApi": {
+          "id": "teUGGLMVTYrw7lVa",
+          "name": "Wordpress Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://optimaquantum.com/wp-json/wp/v2/posts/{{ $('Edit Fields').item.json.postID }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "wordpressApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        288,
+        48
+      ],
+      "id": "ff9378ba-b837-42e6-983c-191fcfb087ef",
+      "name": "GetPost",
+      "credentials": {
+        "wordpressApi": {
+          "id": "teUGGLMVTYrw7lVa",
+          "name": "Wordpress Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener el contenido del artículo desde el nodo GetPost\nconst content = $('GetPost').item.json.content.rendered || 'Contenido no encontrado';\nconst secondary1Url = $('subirSegundaIMG1').item.json.link || 'URL1 no encontrada';\nconst secondary2Url = $('subirTerceraIMG1').item.json.link || 'URL2 no encontrada';\n\n// Obtener el ID del post desde Edit Fields\nconst postId = $('Edit Fields').item.json.postID;\n\n// Dividir el contenido en párrafos\nconst paragraphs = content.split('</p>').filter(p => p.trim().length > 0);\n\n// Crear un nuevo array para párrafos e imágenes\nconst updatedParagraphs = [];\nfor (let i = 0; i < paragraphs.length; i++) {\n  updatedParagraphs.push(paragraphs[i]);\n  \n  if (i === 2 && paragraphs.length > 2) {\n    updatedParagraphs.push(`<img src=\"${secondary1Url}\" alt=\"${$('Edit Fields').item.json.keyPhrase}\" style=\"max-width: 300px; height: auto; display: block; margin: 0 auto;\" />`);\n  }\n  \n  if (i === 3 && paragraphs.length > 3) {\n    updatedParagraphs.push(`<img src=\"${secondary2Url}\" alt=\"${$('Edit Fields').item.json.keyPhrase}\" style=\"max-width: 300px; height: auto; display: block; margin: 0 auto;\" />`);\n  }\n}\n\n// Unir párrafos e imágenes\nconst updatedContent = updatedParagraphs.map(item => {\n  if (item.includes('<img')) return item;\n  return `${item}</p>`;\n}).join('\\n');\n\n// Escapar el contenido para JSON\nconst escapedContent = updatedContent.replace(/\"/g, '\\\\\"').replace(/\\n/g, '\\\\n');\n\nconsole.log('Contenido original:', content);\nconsole.log('Contenido escapado:', escapedContent);\n\n// Devolver el contenido y el postId\nreturn [{ json: { content: escapedContent, postId: postId } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        48
+      ],
+      "id": "b2963fcb-c910-4025-b7bb-b5d73d31aeb2",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b49b817e-1a7a-483a-bcd9-3a66ba3317a6",
+              "name": "body",
+              "value": "={\"content\": \"{{ $('Code').item.json.content }}\"}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        608,
+        48
+      ],
+      "name": "PrepareBody",
+      "id": "52d27417-4c9d-44e5-9a8c-160107f3ee33"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://optimaquantum.com/wp-json/wp/v2/posts/{{ $('Code').item.json.postId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "wordpressApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('PrepareBody').item.json.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        768,
+        48
+      ],
+      "id": "a031b878-7604-4e39-a1de-4153ff0bd521",
+      "name": "UpdatePost",
+      "credentials": {
+        "wordpressApi": {
+          "id": "teUGGLMVTYrw7lVa",
+          "name": "Wordpress Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Genera dos imágenes entre los párrafos del Artículo\n",
+        "height": 540,
+        "width": 1160,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -224,
+        -336
+      ],
+      "typeVersion": 1,
+      "id": "64d85817-67e0-43f3-bea2-59fa464eb0d5",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Introduce los siguientes datos:\n\n1- **Título Artículo o Promp**\n\n2- **ID pulicación Wordpress** \n\n",
+        "height": 360,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -464,
+        -160
+      ],
+      "typeVersion": 1,
+      "id": "942d7bfe-4fba-44e9-891f-05705afa4adc",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Nota: \n**En ocasiones muestra error pero funciona correctamente.**",
+        "height": 260,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        240,
+        -256
+      ],
+      "typeVersion": 1,
+      "id": "7d5ac4d1-a1c0-4c1a-ba96-be1bad149e3f",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {
+    "Inicio": [
+      {
+        "json": {
+          "promp": "IA Revoluciona la Logística: Eficiencia y Costos Reducidos",
+          "id": 2153
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Inicio": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Traductor",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "subirSegundaIMG1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "subirTerceraIMG1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "GetPost",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Traductor": {
+      "main": [
+        [
+          {
+            "node": "generarSegundaImg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generarSegundaImg": {
+      "main": [
+        [
+          {
+            "node": "subirSegundaIMG1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "subirSegundaIMG1": {
+      "main": [
+        [
+          {
+            "node": "generarTerceraImg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generarTerceraImg": {
+      "main": [
+        [
+          {
+            "node": "subirTerceraIMG1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "subirTerceraIMG1": {
+      "main": [
+        [
+          {
+            "node": "GetPost",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetPost": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "PrepareBody",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PrepareBody": {
+      "main": [
+        [
+          {
+            "node": "UpdatePost",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "be868c8c-c8ff-473a-ba08-fdc64cd6d5c2",
+  "meta": {
+    "instanceId": "91e9bc2fd2d08736422cccee7e1506bda336e368f82dcb792c9d1bbf6348503c"
+  },
+  "id": "A8nlMBz1TP60TfbE",
+  "tags": []
+}

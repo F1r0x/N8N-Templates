@@ -1,0 +1,2988 @@
+{
+  "name": "Social Media - Generador de Artículos Metricool",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        160,
+        -528
+      ],
+      "id": "4de74014-25cf-4bef-95f3-df744ec325d6",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "postId": "={{ $json.ID }}",
+        "options": {}
+      },
+      "id": "5e410229-87a2-426e-b60f-6ca56ec0edb5",
+      "name": "Descargar Artículo WordPress1",
+      "type": "n8n-nodes-base.wordpress",
+      "position": [
+        400,
+        -496
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "wordpressApi": {
+          "id": "teUGGLMVTYrw7lVa",
+          "name": "Wordpress Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg",
+          "mode": "list",
+          "cachedResultName": "Artículos Wordpress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Numeración de IDs de Artículos Wordpress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -320,
+        -480
+      ],
+      "id": "e223986a-0e3a-476e-a0de-0541fab4f1a5",
+      "name": "Artículos Wordpress",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "34bfa668-4228-48f7-af79-e142c5565ca2",
+              "leftValue": "={{ $json.Estado }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -144,
+        -480
+      ],
+      "id": "73e7f94f-706d-460c-9495-ecfea24c21e1",
+      "name": "¿Publicado?"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n        \"instagram\": {\n\t\t\t\"type\": \"string\"\n\t\t}\n\t}\n}"
+      },
+      "id": "2d2b92ef-d716-47c7-a56b-35d23cf478a6",
+      "name": "Estructura de Salida",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        784,
+        -288
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        608,
+        -288
+      ],
+      "id": "70208f5b-2a12-4c8a-a73b-98b1858e89cb",
+      "name": "Modelo de Chatgpt",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg",
+          "mode": "list",
+          "cachedResultName": "Artículos Wordpress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Numeración de IDs de Artículos Wordpress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json['Post ID'] }}",
+            "Estado": "✅"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Titulo",
+              "displayName": "Titulo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1360,
+        -128
+      ],
+      "id": "8c7d12dc-6c80-4c74-9eb5-5846b6df4a88",
+      "name": "Marcar artículo como publicado",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "={{ $('Instagram').item.json.output.instagram }}\n\nImportante, sin letras ni textos.",
+        "options": {
+          "size": "1024x1024",
+          "returnImageUrls": true
+        }
+      },
+      "id": "a297ac7e-9c0f-4137-b28a-72fa47e33721",
+      "name": "Image Instagram",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        1728,
+        -496
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1904,
+        -496
+      ],
+      "id": "3f7d9cc4-c9e4-402a-962e-f1a4f90a2dcd",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate 4 separate social media posts (captions only) based on the following article titled \"{{ $json.title?.rendered }}\n\".\n\nEach post should be written in the same language as the article and tailored to the specific platform, as follows:\n\n**Instagram**:\n   - Length: Maximum 2,100 characters.\n   - Style: Casual, engaging, relatable.\n   - Include 3 to 4 relevant hashtags.\n   - Emojis are welcome if appropriate.\n\nHere is the article content:\n\"\n{{ $json.content?.rendered ? $json.content.rendered : $json.message?.content }}\n\n\"\n",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Generate 4 separate social media posts (captions only) based on the following article titled \"{{ $json.title?.rendered || $('On form submission').item.json['Título']}}\n\".\n\nEach post should be written in the same language as the article and tailored to the specific platform, as follows:\n\n**Instagram**:\n   - Length: Maximum 2,100 characters.\n   - Style: Casual, engaging, relatable.\n   - Include 3 to 4 relevant hashtags.\n   - Emojis are welcome if appropriate.\n\n\n\nHere is the article content:\n\"\"\"\n{{ $json.content?.rendered ? $json.content.rendered : $json.message?.content }}\n\n\"\"\"\n"
+            }
+          ]
+        }
+      },
+      "id": "7e2e5822-b535-4a25-baba-8f95450930d9",
+      "name": "Instagram",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        608,
+        -496
+      ],
+      "typeVersion": 1.5,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"facebook\": {\n\t\t\t\"type\": \"string\"\n\t\t}\n\t}\n}"
+      },
+      "id": "c7dbb5ee-4e2e-4e68-9c99-2ecd2c79d563",
+      "name": "Estructura de Salida1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        1392,
+        -288
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1168,
+        -288
+      ],
+      "id": "abeae19d-835a-42c7-8cf3-be783e9747b4",
+      "name": "Modelo de Chatgpt1",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate 4 separate social media posts (captions only) based on the following article titled \"{{ $('Loop Over Items').item.json.Titulo }}\".\n\nEach post should be written in the same language as the article and tailored to the specific platform, as follows:\n\n\n**Facebook**:\n   - Length: Maximum 2,100 characters.\n   - Style: Casual, engaging, relatable.\n   - Include 3 to 4 relevant hashtags.\n   - Emojis are welcome if appropriate.\n\nHere is the article content:\n\"\"\"\n{{ $('Descargar Artículo WordPress1').item.json.guid.rendered }}\n\"\"\"",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Generate 4 separate social media posts (captions only) based on the following article titled \"{{ $('Loop Over Items').item.json.Titulo }}\".\n\nEach post should be written in the same language as the article and tailored to the specific platform, as follows:\n\n\n**Facebook**:\n   - Length: Maximum 2,100 characters.\n   - Style: Casual, engaging, relatable.\n   - Include 3 to 4 relevant hashtags.\n   - Emojis are welcome if appropriate.\n\nHere is the article content:\n\"\"\"\n{{ $('Descargar Artículo WordPress1').item.json.guid.rendered }}\n\"\"\""
+            }
+          ]
+        }
+      },
+      "id": "b83e493f-7c11-4b05-9915-9193807951e5",
+      "name": "Facebook",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        1168,
+        -480
+      ],
+      "typeVersion": 1.5,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"tiktok\": {\n\t\t\t\"type\": \"string\"\n\t\t}\n\t}\n}"
+      },
+      "id": "25788124-dac0-4da2-bdc9-c0b672f2c256",
+      "name": "Estructura de Salida2",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        384,
+        112
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"threads\": {\n\t\t\t\"type\": \"string\"\n\t\t}\n\t}\n}"
+      },
+      "id": "1c2fab55-93dd-4af7-bdb2-bd27feb6ffed",
+      "name": "Estructura de Salida3",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        1008,
+        112
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        768,
+        112
+      ],
+      "id": "b1b4289b-dc55-496c-a5b1-0880568d1bd4",
+      "name": "Modelo de Chatgpt3",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate 4 separate social media posts (captions only) based on the following article titled \"{{ $json.title.rendered }}\".\n\nEach post should be written in the same language as the article and tailored to the specific platform, as follows:\n\n**TikTok**:\n   - Length: Maximum 2,200 characters.\n   - Style: Conversational, fun, possibly slightly edgy or playful depending on content.\n   - Include hashtags and emojis as appropriate.\n   - If applicable, suggest an idea for a video hook or intro line to attract attention.\n\nHere is the article content:\n\"\"\"\n{{ $json.content.rendered }}\n\"\"\"\n",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Generate 4 separate social media posts (captions only) based on the following article titled \"{{ $json.title.rendered }}\".\n\nEach post should be written in the same language as the article and tailored to the specific platform, as follows:\n\n**TikTok**:\n   - Length: Maximum 2,200 characters.\n   - Style: Conversational, fun, possibly slightly edgy or playful depending on content.\n   - Include hashtags and emojis as appropriate.\n   - If applicable, suggest an idea for a video hook or intro line to attract attention.\n\nHere is the article content:\n\"\"\"\n{{ $json.content.rendered }}\n\"\"\"\n"
+            }
+          ]
+        }
+      },
+      "id": "ba5d5fb9-e395-45fb-b442-f3269f2730cd",
+      "name": "TikTok",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        160,
+        -96
+      ],
+      "typeVersion": 1.5,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate 4 separate social media posts (captions only) based on the following article titled \"{{ $json.title.rendered }}\".\n\nEach post should be written in the same language as the article and tailored to the specific platform, as follows:\n\n\n**Threads**:\n   - Length: Maximum 500 characters.\n   - Style: Casual, engaging, relatable.\n   - Include 3 to 4 relevant hashtags.\n   - Emojis are welcome if appropriate.\n\nHere is the article content:\n\"\"\"\n{{ $json.content.rendered }}\n\"\"\"",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Generate 4 separate social media posts (captions only) based on the following article titled \"{{ $json.title.rendered }}\".\n\nEach post should be written in the same language as the article and tailored to the specific platform, as follows:\n\n\n**Facebook**:\n   - Length: Maximum 2,100 characters.\n   - Style: Casual, engaging, relatable.\n   - Include 3 to 4 relevant hashtags.\n   - Emojis are welcome if appropriate.\n\nHere is the article content:\n\"\"\"\n{{ $json.content.rendered }}\n\"\"\""
+            }
+          ]
+        }
+      },
+      "id": "824047f7-c40b-4626-807b-d47d28ecd776",
+      "name": "Threads",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        784,
+        -128
+      ],
+      "typeVersion": 1.5,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg",
+          "mode": "list",
+          "cachedResultName": "Artículos Wordpress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1016010412,
+          "mode": "list",
+          "cachedResultName": "Publicaciones Redes Sociales",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit#gid=1016010412"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Post ID": "={{ $('Loop Over Items').item.json.ID }}",
+            "Tiktok": "={{ $json.output.tiktok }}"
+          },
+          "matchingColumns": [
+            "Post ID"
+          ],
+          "schema": [
+            {
+              "id": "Post ID",
+              "displayName": "Post ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Instagram",
+              "displayName": "Instagram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Facebook",
+              "displayName": "Facebook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Tiktok",
+              "displayName": "Tiktok",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Threads",
+              "displayName": "Threads",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Imágenes",
+              "displayName": "Imágenes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        592,
+        -128
+      ],
+      "id": "608e6626-c693-440f-94dc-618cbc4b51dd",
+      "name": "Guardar Publicaciones2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg",
+          "mode": "list",
+          "cachedResultName": "Artículos Wordpress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1016010412,
+          "mode": "list",
+          "cachedResultName": "Publicaciones Redes Sociales",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit#gid=1016010412"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Post ID": "={{ $('Loop Over Items').item.json.ID }}",
+            "Threads": "={{ $json.output.threads }}"
+          },
+          "matchingColumns": [
+            "Post ID"
+          ],
+          "schema": [
+            {
+              "id": "Post ID",
+              "displayName": "Post ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Instagram",
+              "displayName": "Instagram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Facebook",
+              "displayName": "Facebook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Tiktok",
+              "displayName": "Tiktok",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Threads",
+              "displayName": "Threads",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Imágenes",
+              "displayName": "Imágenes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1168,
+        -128
+      ],
+      "id": "426622b5-6046-4e45-b6c6-4a8d1dab1449",
+      "name": "Guardar Publicaciones3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg",
+          "mode": "list",
+          "cachedResultName": "Artículos Wordpress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1016010412,
+          "mode": "list",
+          "cachedResultName": "Publicaciones Redes Sociales",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit#gid=1016010412"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Post ID": "={{ $('Loop Over Items').item.json.ID }}",
+            "Title": "={{ $('Loop Over Items').item.json.Titulo }}",
+            "Instagram": "={{ $('Instagram').item.json.output.instagram }}"
+          },
+          "matchingColumns": [
+            "Post ID"
+          ],
+          "schema": [
+            {
+              "id": "Post ID",
+              "displayName": "Post ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Instagram",
+              "displayName": "Instagram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Facebook",
+              "displayName": "Facebook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Tiktok",
+              "displayName": "Tiktok",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Threads",
+              "displayName": "Threads",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Imágenes",
+              "displayName": "Imágenes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        960,
+        -480
+      ],
+      "id": "5cfc2168-aad0-4b0e-9c67-391b34487275",
+      "name": "Guardar Publicación Instagram",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Loop Over Items').item.json.ID }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1GrJI4gCdnabiGr5UaMtN6H7CD5cYrR8s",
+          "mode": "list",
+          "cachedResultName": "Imágenes Social Media OptimaQuantum",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1GrJI4gCdnabiGr5UaMtN6H7CD5cYrR8s"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2080,
+        -496
+      ],
+      "id": "aa380cc0-4e7e-4d73-91f8-ab2c79cedd3c",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "0PvW2FTXCOmfQOlF",
+          "name": "Google Drive OptimaQuantum"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        160,
+        112
+      ],
+      "id": "9599b531-71ae-44a6-b99b-1b0055b62b29",
+      "name": "Modelo de Chatgpt2",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v22.0",
+        "node": "61574648423775",
+        "edge": "feed",
+        "sendBinaryData": true,
+        "binaryPropertyName": "data",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "message",
+                "value": "={{ $('Facebook').item.json.output.facebook }}"
+              },
+              {
+                "name": "link",
+                "value": "={{ $('Descargar Artículo WordPress1').item.json.link }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "49c5b3ab-f4b9-41b1-933f-bafbdff88937",
+      "name": "Publish on Facebook",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "position": [
+        2080,
+        -320
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "qVNnjHhKFjQp0sbF",
+          "name": "Facebook Graph account 2"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg",
+          "mode": "list",
+          "cachedResultName": "Artículos Wordpress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1016010412,
+          "mode": "list",
+          "cachedResultName": "Publicaciones Redes Sociales",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit#gid=1016010412"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Post ID": "={{ $('Loop Over Items').item.json.ID }}",
+            "Facebook": "={{ $json.output.facebook }}"
+          },
+          "matchingColumns": [
+            "Post ID"
+          ],
+          "schema": [
+            {
+              "id": "Post ID",
+              "displayName": "Post ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Instagram",
+              "displayName": "Instagram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Facebook",
+              "displayName": "Facebook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tiktok",
+              "displayName": "Tiktok",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Threads",
+              "displayName": "Threads",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Imágenes",
+              "displayName": "Imágenes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1520,
+        -496
+      ],
+      "id": "a2edab27-7997-4517-9e5f-a6d19fad5f66",
+      "name": "Guardar Publicación Facebook",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "person": "FYEKbbaqnr",
+        "text": "={{ $('Linkedin').item.json.output.linkedin }}",
+        "shareMediaCategory": "IMAGE",
+        "additionalFields": {}
+      },
+      "id": "957512ec-0b0c-4832-b61f-0a111e5451b3",
+      "name": "Publish on LinkedIn",
+      "type": "n8n-nodes-base.linkedIn",
+      "position": [
+        1952,
+        80
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "W7ANaf0syZbnP0ex",
+          "name": "LinkedIn Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1568,
+        48
+      ],
+      "id": "4b489f71-876e-4739-9a5e-681785d1f1df",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "={{ $json.output.linkedin }}",
+        "options": {
+          "size": "1792x1024",
+          "returnImageUrls": false
+        }
+      },
+      "id": "47cfc29e-6760-4ec1-920c-ad02af73e2db",
+      "name": "Image Linkedin",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        1952,
+        -128
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n        \"linkedin\": {\n\t\t\t\"type\": \"string\"\n\t\t}\n\t}\n}"
+      },
+      "id": "521f5957-04f2-4878-9205-7494f33040c1",
+      "name": "Structured Output",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        1744,
+        48
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate social content from the following text with title \"{{ $('Loop Over Items').item.json.Titulo }}\" (in the same language):\n\n'''\n{{ $('Descargar Artículo WordPress1').item.json.guid.rendered }}\n'''",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "==Generate social content from the following text with title \"{{ $('Loop Over Items').item.json.Titulo }}\" (in the same language):\n\n'''\n{{ $('Descargar Artículo WordPress1').item.json.guid.rendered }}\n'''"
+            }
+          ]
+        }
+      },
+      "id": "a88cecae-94be-4611-aed8-eab6bab51c94",
+      "name": "Linkedin",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        1568,
+        -128
+      ],
+      "typeVersion": 1.5
+    },
+    {
+      "parameters": {
+        "formTitle": "Generador de Publicaciones",
+        "formDescription": "Introduce los datos para generar publicaciones personalizadas.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Título"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -256,
+        512
+      ],
+      "id": "715e7c58-47f1-4f6c-bd46-4ccbe60e4e51",
+      "name": "On form submission",
+      "webhookId": "67366ea6-5deb-49ef-babc-f9111d830d75"
+    },
+    {
+      "parameters": {
+        "content": "# Generador de Contenido basados en las publicaciones de Wordpress\n",
+        "height": 920,
+        "width": 2160,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        112,
+        -624
+      ],
+      "typeVersion": 1,
+      "id": "c0f63111-45e6-45aa-ad8e-a50cc5ab1628",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Generar Artículo desde Wordpress",
+        "height": 260,
+        "width": 600,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -528,
+        -576
+      ],
+      "typeVersion": 1,
+      "id": "cf6d88ed-d028-46a8-baf9-ee7465966c03",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=gpt-4o",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Genera un artículo de entre 2000 a 2200 caracteres para publicaciones en redes sociales, basado en las palabras clave: {{ $json['Título'] }}.\n\nLa introducción debe tener unas 60 palabras, presentar el tema central y ser llamativa para captar la atención del lector desde el inicio. No uses títulos en esta parte.\n\nEscribe 1-2 párrafos con subtítulos en mayúsculas y rodeados de emojis relacionados con el tema. Los párrafos deben tener un flujo lógico, estilo cercano y profesional, sin repetir ideas.\n\nFinaliza con una conclusión de unas 60 palabras que resuma el mensaje de forma inspiradora, emocional o motivacional. Evita frases como \"en conclusión\" o similares.\n"
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 2048
+        }
+      },
+      "id": "650db52d-81db-45d5-aa95-370a83ba9851",
+      "name": "Generate article",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        -64,
+        512
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        -480
+      ],
+      "id": "505a44e8-bf7c-49aa-b2da-08f41d7ef8da",
+      "name": "Inicio"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n        \"instagram\": {\n\t\t\t\"type\": \"string\"\n\t\t}\n\t}\n}"
+      },
+      "id": "edbf401d-66f4-4097-be1c-4a97ee5ba9b8",
+      "name": "Estructura de Salida4",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        800,
+        720
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        624,
+        720
+      ],
+      "id": "9d13bf5c-0105-43e2-95ce-40ee79ff38a0",
+      "name": "Modelo de Chatgpt4",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg",
+          "mode": "list",
+          "cachedResultName": "Artículos Wordpress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Numeración de IDs de Artículos Wordpress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json['Post ID'] }}",
+            "Estado": "✅"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Titulo",
+              "displayName": "Titulo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1392,
+        880
+      ],
+      "id": "22434865-45ce-4048-b08c-1616ab494f5a",
+      "name": "Marcar artículo como publicado1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "={{ $('Instagram1').item.json.output.instagram }}\n\nImportante, sin letras ni textos.",
+        "options": {
+          "size": "1024x1024",
+          "returnImageUrls": true
+        }
+      },
+      "id": "aabc75bb-b49c-461e-8040-621ab711a6d0",
+      "name": "Image Instagram1",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        1744,
+        512
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1920,
+        512
+      ],
+      "id": "18f92b00-dae3-4f3e-ad6a-fbeaf24f0f23",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate 4 separate social media posts (captions only) based on the following article titled \"{{ $json.title?.rendered || $('On form submission').item.json['Título']}}\n\".\n\nEach post should be written in the same language as the article and tailored to the specific platform, as follows:\n\n**Instagram**:\n   - Length: Maximum 2,100 characters.\n   - Style: Casual, engaging, relatable.\n   - Include 3 to 4 relevant hashtags.\n   - Emojis are welcome if appropriate.\n\nHere is the article content:\n\"\n{{ $json.content?.rendered ? $json.content.rendered : $json.message?.content }}\n\n\"\n",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Generate 4 separate social media posts (captions only) based on the following article titled \"{{ $json.title?.rendered || $('On form submission').item.json['Título']}}\n\".\n\nEach post should be written in the same language as the article and tailored to the specific platform, as follows:\n\n**Instagram**:\n   - Length: Maximum 2,100 characters.\n   - Style: Casual, engaging, relatable.\n   - Include 3 to 4 relevant hashtags.\n   - Emojis are welcome if appropriate.\n\n\n\nHere is the article content:\n\"\"\"\n{{ $json.content?.rendered ? $json.content.rendered : $json.message?.content }}\n\n\"\"\"\n"
+            }
+          ]
+        }
+      },
+      "id": "8bdd2dbc-9156-43a9-bac5-df0276bdea64",
+      "name": "Instagram1",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        624,
+        512
+      ],
+      "typeVersion": 1.5,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"facebook\": {\n\t\t\t\"type\": \"string\"\n\t\t}\n\t}\n}"
+      },
+      "id": "83c64ddb-3626-40a0-8871-dd97432bcee5",
+      "name": "Estructura de Salida5",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        1408,
+        720
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1184,
+        720
+      ],
+      "id": "9514d34b-6da6-4244-8a3e-562dc30f25b6",
+      "name": "Modelo de Chatgpt5",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate 4 separate social media posts (captions only) based on the following article titled \"{{ $('Loop Over Items1').item.json.Titulo }}\".\n\nEach post should be written in the same language as the article and tailored to the specific platform, as follows:\n\n\n**Facebook**:\n   - Length: Maximum 2,100 characters.\n   - Style: Casual, engaging, relatable.\n   - Include 3 to 4 relevant hashtags.\n   - Emojis are welcome if appropriate.\n\nHere is the article content:\n\"\"\"\n{{ $('Descargar Artículo WordPress').item.json.guid.rendered }}\n\"\"\"",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Generate 4 separate social media posts (captions only) based on the following article titled \"{{ $('Loop Over Items1').item.json.Titulo }}\".\n\nEach post should be written in the same language as the article and tailored to the specific platform, as follows:\n\n\n**Facebook**:\n   - Length: Maximum 2,100 characters.\n   - Style: Casual, engaging, relatable.\n   - Include 3 to 4 relevant hashtags.\n   - Emojis are welcome if appropriate.\n\nHere is the article content:\n\"\"\"\n{{ $('Descargar Artículo WordPress').item.json.guid.rendered }}\n\"\"\""
+            }
+          ]
+        }
+      },
+      "id": "ab796824-38b2-4add-8f23-d5a8df2e533f",
+      "name": "Facebook1",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        1184,
+        528
+      ],
+      "typeVersion": 1.5,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"tiktok\": {\n\t\t\t\"type\": \"string\"\n\t\t}\n\t}\n}"
+      },
+      "id": "86fafbd1-2624-4a5c-b5f9-1d9544c8dcbb",
+      "name": "Estructura de Salida6",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        400,
+        1104
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"threads\": {\n\t\t\t\"type\": \"string\"\n\t\t}\n\t}\n}"
+      },
+      "id": "190262b1-d84d-4352-8a3e-cd92dbf1a82c",
+      "name": "Estructura de Salida7",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        1024,
+        1104
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        784,
+        1104
+      ],
+      "id": "40420526-7fde-4bd5-a395-31ebff95e92d",
+      "name": "Modelo de Chatgpt6",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate 4 separate social media posts (captions only) based on the following article titled \"{{ $json.title.rendered }}\".\n\nEach post should be written in the same language as the article and tailored to the specific platform, as follows:\n\n**TikTok**:\n   - Length: Maximum 2,200 characters.\n   - Style: Conversational, fun, possibly slightly edgy or playful depending on content.\n   - Include hashtags and emojis as appropriate.\n   - If applicable, suggest an idea for a video hook or intro line to attract attention.\n\nHere is the article content:\n\"\"\"\n{{ $json.content.rendered }}\n\"\"\"\n",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Generate 4 separate social media posts (captions only) based on the following article titled \"{{ $json.title.rendered }}\".\n\nEach post should be written in the same language as the article and tailored to the specific platform, as follows:\n\n**TikTok**:\n   - Length: Maximum 2,200 characters.\n   - Style: Conversational, fun, possibly slightly edgy or playful depending on content.\n   - Include hashtags and emojis as appropriate.\n   - If applicable, suggest an idea for a video hook or intro line to attract attention.\n\nHere is the article content:\n\"\"\"\n{{ $json.content.rendered }}\n\"\"\"\n"
+            }
+          ]
+        }
+      },
+      "id": "6b4bf6de-53ba-4df3-9de3-5a6c6eddd301",
+      "name": "TikTok1",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        192,
+        912
+      ],
+      "typeVersion": 1.5,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate 4 separate social media posts (captions only) based on the following article titled \"{{ $json.title.rendered }}\".\n\nEach post should be written in the same language as the article and tailored to the specific platform, as follows:\n\n\n**Threads**:\n   - Length: Maximum 500 characters.\n   - Style: Casual, engaging, relatable.\n   - Include 3 to 4 relevant hashtags.\n   - Emojis are welcome if appropriate.\n\nHere is the article content:\n\"\"\"\n{{ $json.content.rendered }}\n\"\"\"",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Generate 4 separate social media posts (captions only) based on the following article titled \"{{ $json.title.rendered }}\".\n\nEach post should be written in the same language as the article and tailored to the specific platform, as follows:\n\n\n**Facebook**:\n   - Length: Maximum 2,100 characters.\n   - Style: Casual, engaging, relatable.\n   - Include 3 to 4 relevant hashtags.\n   - Emojis are welcome if appropriate.\n\nHere is the article content:\n\"\"\"\n{{ $json.content.rendered }}\n\"\"\""
+            }
+          ]
+        }
+      },
+      "id": "3c08004b-e2cf-4df2-b6c8-44fceb4674bc",
+      "name": "Threads1",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        800,
+        880
+      ],
+      "typeVersion": 1.5,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg",
+          "mode": "list",
+          "cachedResultName": "Artículos Wordpress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1016010412,
+          "mode": "list",
+          "cachedResultName": "Publicaciones Redes Sociales",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit#gid=1016010412"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Post ID": "={{ $('Loop Over Items1').item.json.ID }}",
+            "Tiktok": "={{ $json.output.tiktok }}"
+          },
+          "matchingColumns": [
+            "Post ID"
+          ],
+          "schema": [
+            {
+              "id": "Post ID",
+              "displayName": "Post ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Instagram",
+              "displayName": "Instagram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Facebook",
+              "displayName": "Facebook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Tiktok",
+              "displayName": "Tiktok",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Threads",
+              "displayName": "Threads",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Imágenes",
+              "displayName": "Imágenes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        608,
+        880
+      ],
+      "id": "7c617136-3ab3-4bc3-b396-d9883ef6e995",
+      "name": "Guardar Publicaciones",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg",
+          "mode": "list",
+          "cachedResultName": "Artículos Wordpress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1016010412,
+          "mode": "list",
+          "cachedResultName": "Publicaciones Redes Sociales",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit#gid=1016010412"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Post ID": "={{ $('Loop Over Items1').item.json.ID }}",
+            "Threads": "={{ $json.output.threads }}"
+          },
+          "matchingColumns": [
+            "Post ID"
+          ],
+          "schema": [
+            {
+              "id": "Post ID",
+              "displayName": "Post ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Instagram",
+              "displayName": "Instagram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Facebook",
+              "displayName": "Facebook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Tiktok",
+              "displayName": "Tiktok",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Threads",
+              "displayName": "Threads",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Imágenes",
+              "displayName": "Imágenes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1184,
+        880
+      ],
+      "id": "294669df-5728-4fa2-9ea9-2d2d6a231170",
+      "name": "Guardar Publicaciones4",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg",
+          "mode": "list",
+          "cachedResultName": "Artículos Wordpress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1016010412,
+          "mode": "list",
+          "cachedResultName": "Publicaciones Redes Sociales",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit#gid=1016010412"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Post ID": "={{ $('Loop Over Items1').item.json.ID }}",
+            "Title": "={{ $('Loop Over Items1').item.json.Titulo }}",
+            "Instagram": "={{ $('Instagram1').item.json.output.instagram }}"
+          },
+          "matchingColumns": [
+            "Post ID"
+          ],
+          "schema": [
+            {
+              "id": "Post ID",
+              "displayName": "Post ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Instagram",
+              "displayName": "Instagram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Facebook",
+              "displayName": "Facebook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Tiktok",
+              "displayName": "Tiktok",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Threads",
+              "displayName": "Threads",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Imágenes",
+              "displayName": "Imágenes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        992,
+        528
+      ],
+      "id": "0d4a0e98-e350-4041-903c-be4342839ed5",
+      "name": "Guardar Publicación Instagram1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Loop Over Items1').item.json.ID }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1GrJI4gCdnabiGr5UaMtN6H7CD5cYrR8s",
+          "mode": "list",
+          "cachedResultName": "Imágenes Social Media OptimaQuantum",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1GrJI4gCdnabiGr5UaMtN6H7CD5cYrR8s"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2112,
+        512
+      ],
+      "id": "7d752f8b-e2f6-4b49-89ce-585e582f956f",
+      "name": "Google Drive1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "0PvW2FTXCOmfQOlF",
+          "name": "Google Drive OptimaQuantum"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        192,
+        1104
+      ],
+      "id": "f0210063-a39a-4b3e-8f3b-ee6e0cbfec4f",
+      "name": "Modelo de Chatgpt7",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v22.0",
+        "node": "61574648423775",
+        "edge": "feed",
+        "sendBinaryData": true,
+        "binaryPropertyName": "data",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "message",
+                "value": "={{ $('Facebook1').item.json.output.facebook }}"
+              },
+              {
+                "name": "link",
+                "value": "={{ $('Descargar Artículo WordPress').item.json.link }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "28df95ba-c478-4496-a0e6-ab1a39760b08",
+      "name": "Publish on Facebook1",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "position": [
+        2112,
+        688
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "qVNnjHhKFjQp0sbF",
+          "name": "Facebook Graph account 2"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg",
+          "mode": "list",
+          "cachedResultName": "Artículos Wordpress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1016010412,
+          "mode": "list",
+          "cachedResultName": "Publicaciones Redes Sociales",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit#gid=1016010412"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Post ID": "={{ $('Loop Over Items1').item.json.ID }}",
+            "Facebook": "={{ $json.output.facebook }}"
+          },
+          "matchingColumns": [
+            "Post ID"
+          ],
+          "schema": [
+            {
+              "id": "Post ID",
+              "displayName": "Post ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Instagram",
+              "displayName": "Instagram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Facebook",
+              "displayName": "Facebook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tiktok",
+              "displayName": "Tiktok",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Threads",
+              "displayName": "Threads",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Imágenes",
+              "displayName": "Imágenes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1552,
+        512
+      ],
+      "id": "cc32bc5d-b1db-480f-aebe-22672fcd4e89",
+      "name": "Guardar Publicación Facebook1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "person": "FYEKbbaqnr",
+        "text": "={{ $('Linkedin1').item.json.output.linkedin }}",
+        "shareMediaCategory": "IMAGE",
+        "additionalFields": {}
+      },
+      "id": "33a66495-e04b-4ea6-b08d-8ac1ee798d94",
+      "name": "Publish on LinkedIn1",
+      "type": "n8n-nodes-base.linkedIn",
+      "position": [
+        1968,
+        1088
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "W7ANaf0syZbnP0ex",
+          "name": "LinkedIn Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1584,
+        1040
+      ],
+      "id": "61988612-c291-4860-a463-1676b5c6a8f7",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "={{ $json.output.linkedin }}",
+        "options": {
+          "size": "1792x1024",
+          "returnImageUrls": false
+        }
+      },
+      "id": "3736a3f9-ae8f-4e15-8668-16575db968f3",
+      "name": "Image Linkedin1",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        1968,
+        880
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n        \"linkedin\": {\n\t\t\t\"type\": \"string\"\n\t\t}\n\t}\n}"
+      },
+      "id": "29801949-0384-4b30-8196-2321f1d2d30e",
+      "name": "Structured Output1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        1760,
+        1040
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate social content from the following text with title \"{{ $('Loop Over Items1').item.json.Titulo }}\" (in the same language):\n\n'''\n{{ $('Descargar Artículo WordPress').item.json.guid.rendered }}\n'''",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "==Generate social content from the following text with title \"{{ $('Loop Over Items1').item.json.Titulo }}\" (in the same language):\n\n'''\n{{ $('Descargar Artículo WordPress').item.json.guid.rendered }}\n'''"
+            }
+          ]
+        }
+      },
+      "id": "fe0e21f7-db91-434c-948b-bbaccd6887f9",
+      "name": "Linkedin1",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        1584,
+        880
+      ],
+      "typeVersion": 1.5
+    },
+    {
+      "parameters": {
+        "content": "# Generador de Contenido mediante formulario\n",
+        "height": 840,
+        "width": 2160,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        128,
+        432
+      ],
+      "typeVersion": 1,
+      "id": "304423c2-eac3-4337-a15a-8726e34467f2",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Descargar Artículo WordPress1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Descargar Artículo WordPress1": {
+      "main": [
+        [
+          {
+            "node": "Instagram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Artículos Wordpress": {
+      "main": [
+        [
+          {
+            "node": "¿Publicado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Publicado?": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Estructura de Salida": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Instagram",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modelo de Chatgpt": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Instagram",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marcar artículo como publicado": {
+      "main": [
+        [
+          {
+            "node": "Linkedin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Instagram": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Publish on Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Instagram": {
+      "main": [
+        [
+          {
+            "node": "Guardar Publicación Instagram",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Instagram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Estructura de Salida1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Facebook",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modelo de Chatgpt1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Facebook",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facebook": {
+      "main": [
+        [
+          {
+            "node": "Guardar Publicación Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Estructura de Salida2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "TikTok",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Estructura de Salida3": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Threads",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modelo de Chatgpt3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Threads",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TikTok": {
+      "main": [
+        [
+          {
+            "node": "Guardar Publicaciones2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "TikTok",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Threads": {
+      "main": [
+        [
+          {
+            "node": "Guardar Publicaciones3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Threads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Publicación Instagram": {
+      "main": [
+        [
+          {
+            "node": "Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Publicaciones3": {
+      "main": [
+        [
+          {
+            "node": "Marcar artículo como publicado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Publicaciones2": {
+      "main": [
+        [
+          {
+            "node": "Threads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        []
+      ]
+    },
+    "Modelo de Chatgpt2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "TikTok",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish on Facebook": {
+      "main": [
+        [
+          {
+            "node": "TikTok",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Publicación Facebook": {
+      "main": [
+        [
+          {
+            "node": "Image Instagram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Linkedin",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Linkedin": {
+      "main": [
+        [
+          {
+            "node": "Publish on LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Linkedin",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Linkedin": {
+      "main": [
+        [
+          {
+            "node": "Image Linkedin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish on LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Generate article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inicio": {
+      "main": [
+        [
+          {
+            "node": "Artículos Wordpress",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate article": {
+      "main": [
+        [
+          {
+            "node": "Instagram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Estructura de Salida4": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Instagram1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modelo de Chatgpt4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Instagram1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marcar artículo como publicado1": {
+      "main": [
+        [
+          {
+            "node": "Linkedin1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Instagram1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Google Drive1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Publish on Facebook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Instagram1": {
+      "main": [
+        [
+          {
+            "node": "Guardar Publicación Instagram1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Instagram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Estructura de Salida5": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Facebook1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modelo de Chatgpt5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Facebook1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facebook1": {
+      "main": [
+        [
+          {
+            "node": "Guardar Publicación Facebook1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Facebook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Estructura de Salida6": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "TikTok1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Estructura de Salida7": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Threads1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modelo de Chatgpt6": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Threads1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TikTok1": {
+      "main": [
+        [
+          {
+            "node": "Guardar Publicaciones",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "TikTok1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Threads1": {
+      "main": [
+        [
+          {
+            "node": "Guardar Publicaciones4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Threads1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Publicaciones": {
+      "main": [
+        [
+          {
+            "node": "Threads1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Publicaciones4": {
+      "main": [
+        [
+          {
+            "node": "Marcar artículo como publicado1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Publicación Instagram1": {
+      "main": [
+        [
+          {
+            "node": "Facebook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modelo de Chatgpt7": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "TikTok1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish on Facebook1": {
+      "main": [
+        [
+          {
+            "node": "TikTok1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Publicación Facebook1": {
+      "main": [
+        [
+          {
+            "node": "Image Instagram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish on LinkedIn1": {
+      "main": [
+        []
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Linkedin1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Linkedin1": {
+      "main": [
+        [
+          {
+            "node": "Publish on LinkedIn1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Linkedin1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Linkedin1": {
+      "main": [
+        [
+          {
+            "node": "Image Linkedin1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9ad1fd16-3eda-499e-b65f-480950855ead",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "91e9bc2fd2d08736422cccee7e1506bda336e368f82dcb792c9d1bbf6348503c"
+  },
+  "id": "b0z5jY5XhTXGuFQ6",
+  "tags": []
+}

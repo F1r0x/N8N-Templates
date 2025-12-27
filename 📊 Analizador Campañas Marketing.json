@@ -1,0 +1,127 @@
+{
+  "name": "📊 Analizador Campañas Marketing",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        -96
+      ],
+      "id": "a23c1c31-6c64-4c7a-a006-a7ecd968585f",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Analiza los datos de nuestra campaña de llamadas automáticas y correos electrónicos a 4,000 contactos de empresas, con el objetivo de identificar dónde estamos fallando en la conversión de leads.\n\t1.\tRevisa los logs de llamadas: Determina cuántas llamadas se completaron, cuántas no fueron respondidas, cuántas fueron rechazadas y si hubo algún patrón en los horarios o días.\n\t2.\tEvalúa las respuestas de correo: Verifica cuántos correos fueron entregados exitosamente, cuántos fueron abiertos, cuántos enlaces fueron clicados, y cuántos fueron marcados como spam.\n\t3.\tAnaliza la calidad de los contactos: Comprueba si los datos de contacto son válidos, si los números están activos y si los correos son correctos.\n\t4.\tGenera un informe: Crea un resumen que indique el porcentaje de éxito en las llamadas, la tasa de apertura de correos, y cualquier patrón relevante. Identifica posibles puntos débiles en el proceso.\n\nEntrega el análisis en un formato estructurado para facilitar la revisión y la toma de decisiones.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        0,
+        -96
+      ],
+      "id": "b1fc1622-9d35-42b1-b320-0c2fa95f086e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "table": {
+          "__rl": true,
+          "value": "contactcustomer",
+          "mode": "list",
+          "cachedResultName": "contactcustomer"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySqlTool",
+      "typeVersion": 2.4,
+      "position": [
+        208,
+        112
+      ],
+      "id": "b0014478-3b41-44ed-9b12-bc836f28fe0a",
+      "name": "MySQL",
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -16,
+        112
+      ],
+      "id": "4c9791f1-dce2-4da8-a9bc-abe4e62f6b7c",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7152e751-ad49-4fb2-afa3-5bc333cf4ec9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "91e9bc2fd2d08736422cccee7e1506bda336e368f82dcb792c9d1bbf6348503c"
+  },
+  "id": "Qvhuw8WhZ8WeMzhI",
+  "tags": []
+}

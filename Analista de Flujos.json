@@ -1,0 +1,1278 @@
+{
+  "name": "Analista de Flujos",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM customer LIMIT 10;",
+        "options": {}
+      },
+      "id": "a65d0098-122f-4b19-9200-c0b1d822cb19",
+      "name": "MySQL Tabla Customer",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        -720,
+        -80
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -528,
+        -80
+      ],
+      "id": "70136f03-ba0c-45ce-a1b2-cb117ec3e881",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1104,
+        112
+      ],
+      "id": "c514c159-6ac0-45b5-9f26-ed53aa921fe5",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "url": "=https://smartcalls.biz/es",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Firefox/120.0"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "redirect": {
+            "redirect": {
+              "maxRedirects": 5
+            }
+          },
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          },
+          "timeout": 120000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -736,
+        -448
+      ],
+      "id": "e35be18e-1990-4d48-b981-7cd3e350aec5",
+      "name": "dataDownload",
+      "retryOnFail": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "GPT-3.5-TURBO"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Somos SmartCalls un empresa enfocada en la venta de automatizaciones conversacionales con IA para negocios. Estamos tratando de realizar un proyecto de marketing mediante llamadas con nuestro asistente de IA automatizado con N8N.\n\nQuiero que revises nuestra web y nos indiques en que cosas podríamos mejorar:\n\n {{ $json.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -560,
+        -448
+      ],
+      "id": "fd2afe37-7c63-4ba8-9ee9-cb3eb72ebcd1",
+      "name": "Revisor Web",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let aggregatedData = [];\nfor (let item of $input.all()) {\n  aggregatedData.push(item.json);\n}\nreturn [{\n  json: {\n    aggregatedData: aggregatedData\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        -96
+      ],
+      "id": "d226742a-8ad5-4305-93fa-dacd7237abe6",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648",
+          "mode": "list",
+          "cachedResultName": "N8N Optima",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 977706087,
+          "mode": "list",
+          "cachedResultName": "Informe de Mejorías",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648/edit#gid=977706087"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "0",
+            "Base de Datos Customer": "={{ $('Revisor Conjunto DB Customer').item.json.message.content }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Página Web",
+              "displayName": "Página Web",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Base de Datos Customer",
+              "displayName": "Base de Datos Customer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Base de Datos ContactCustomer",
+              "displayName": "Base de Datos ContactCustomer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Correo Electrónico",
+              "displayName": "Correo Electrónico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Promp Retell AI",
+              "displayName": "Promp Retell AI",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        320,
+        -96
+      ],
+      "id": "bb1134ba-cd00-4223-9432-6103c25b4552",
+      "name": "Generar Informe",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    cleanedText: $input.first().json.message.content\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        144,
+        -96
+      ],
+      "id": "46a45d7e-2e72-48af-acc3-69ca39c017a1",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -16,
+        -448
+      ],
+      "id": "2890fe34-165f-47ee-8198-e5f26057e162",
+      "name": "Wait",
+      "webhookId": "154156e0-8658-4998-93d5-b86d665fc501"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    cleanedText: $input.first().json.message.content\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -224,
+        -448
+      ],
+      "id": "d9b76d0e-e665-4797-b7c6-873d9c7b581e",
+      "name": "Limpiar Texto"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "GPT-3.5-TURBO"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Somos SmartCalls un empresa enfocada en la venta de automatizaciones conversacionales con IA para negocios. Estamos tratando de realizar un proyecto de marketing mediante llamadas con nuestro asistente de IA automatizado con N8N.\n\nQuiero que revises el formato de correo electrónico que le pasamos a nuestros clientes al intentar contactar con ellos y me digas que te parece y en que lo podemos mejorar, revisa tanto el asunto como el contenido:\n\nAsunto:\nHemos intentado ponernos en contacto contigo - ¿Estás perdiendo clientes por no contestar?|\n\nContenido del correo:\nEstimado \\{{ $('MySQL Tabla Customer').item.json.contact_name }},\n\nEl \\{{ $('FechaHora').item.json.fecha }} a las \\{{ $('FechaHora').item.json.hora }}, intentamos contactarte para presentarte SmartCalls, nuestra centralita con inteligencia artificial diseñada para que nunca más pierdas una oportunidad de negocio. No logramos hablar contigo, y esto podría ser una señal de que tu sistema actual de gestión de llamadas está dejando escapar clientes valiosos. \n\nCada llamada perdida es un cliente que se va con la competencia. ¿Sabías que el 80% de los consumidores no vuelve a contactar tras un intento fallido? Sin la tecnología adecuada, estás enfrentando:\n\n\nPérdida de ingresos: Clientes potenciales que no reciben respuesta y buscan otras opciones.\n\n\nMala imagen de marca: La frustración de quienes no logran contactarte afecta tu reputación.\n\n\nTiempo desperdiciado: Gestionar llamadas manualmente te quita horas que podrías dedicar a crecer tu negocio.\n\nSmartCalls resuelve estos problemas con una solución de voz con IA que atiende cada llamada 24/7, personaliza la interacción y convierte oportunidades en ventas, todo de forma automática. Ahorra hasta un 60% en costes operativos y mejora la satisfacción de tus clientes desde el primer contacto.\n\nNo permitas que tu negocio siga perdiendo terreno. Agenda una breve videollamada aquí https://calendar.app.google/2Lbbd3YhDA8cSDsV8 para descubrir cómo SmartCalls puede transformar tu atención telefónica. También puedes contactarnos directamente:\n\nSitio web: https://smartcalls.biz\nEmail: info@smartcalls.biz\nTel: +34 919 932 145\nTel: +1 332 232 7483\n\n¡Actúa ahora y convierte cada llamada en una oportunidad ganada!\n\nUn cordial saludo,\nEl equipo de SmartCalls"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -768,
+        704
+      ],
+      "id": "a97f9a9d-a477-4e26-ae98-43f812e4c43f",
+      "name": "Revisor Correos Electrónicos",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648",
+          "mode": "list",
+          "cachedResultName": "N8N Optima",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 977706087,
+          "mode": "list",
+          "cachedResultName": "Informe de Mejorías",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648/edit#gid=977706087"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "0",
+            "Correo Electrónico": "={{ $json.message.content }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Página Web",
+              "displayName": "Página Web",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Base de Datos Customer",
+              "displayName": "Base de Datos Customer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Base de Datos ContactCustomer",
+              "displayName": "Base de Datos ContactCustomer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Correo Electrónico",
+              "displayName": "Correo Electrónico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Promp Retell AI",
+              "displayName": "Promp Retell AI",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -416,
+        704
+      ],
+      "id": "a8ff19d8-374c-4696-b4ee-36361db959b5",
+      "name": "Generar Informe3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -496,
+        288
+      ],
+      "id": "a592c191-e7b5-45b9-909f-1371ca3482f1",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "jsCode": "let aggregatedData = [];\nfor (let item of $input.all()) {\n  aggregatedData.push(item.json);\n}\nreturn [{\n  json: {\n    aggregatedData: aggregatedData\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        272
+      ],
+      "id": "32ba0952-b258-4121-a10d-12f61e2d5582",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648",
+          "mode": "list",
+          "cachedResultName": "N8N Optima",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 977706087,
+          "mode": "list",
+          "cachedResultName": "Informe de Mejorías",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648/edit#gid=977706087"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "0",
+            "Base de Datos ContactCustomer": "={{ $json.cleanedText }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Página Web",
+              "displayName": "Página Web",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Base de Datos Customer",
+              "displayName": "Base de Datos Customer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Base de Datos ContactCustomer",
+              "displayName": "Base de Datos ContactCustomer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Correo Electrónico",
+              "displayName": "Correo Electrónico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Promp Retell AI",
+              "displayName": "Promp Retell AI",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        352,
+        272
+      ],
+      "id": "e7ecb6f9-374d-4a2d-a9f9-9aa32250ab58",
+      "name": "Generar Informe2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    cleanedText: $input.first().json.message.content\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        272
+      ],
+      "id": "4c11b857-29a5-40c5-919b-d3530e6d33b0",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "GPT-3.5-TURBO"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Somos SmartCalls un empresa enfocada en la venta de automatizaciones conversacionales con IA para negocios. Estamos tratando de realizar un proyecto de marketing mediante llamadas con nuestro asistente de IA automatizado con N8N.\n\nTras realizar un estudio de nuestra base de datos, este es el reporte del análisis realizado por Chatgpt para tratar de mejorar nuestros servicios:\n\n{{ $json.aggregatedData }}\n\nQuiero que me indiques mediante un breve informe, todos los puntos importantes que tenemos que mejorar y como los podríamos hacerlo. "
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -176,
+        -96
+      ],
+      "id": "2134db8b-dbac-4585-bb52-8fe11a9b33ab",
+      "name": "Revisor Conjunto DB Customer",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "GPT-3.5-TURBO"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Somos SmartCalls un empresa enfocada en la venta de automatizaciones conversacionales con IA para negocios. Estamos tratando de realizar un proyecto de marketing mediante llamadas con nuestro asistente de IA automatizado con N8N.\n\nQuiero que compruebes los datos de la base de datos y me indiques brevemente si crees que los datos están bien almacenados, si crees que hay errores y si implementarias alguna mejora.\n\nEstos son los datos que tenemos almacenados en nuestra base de datos MySQL:\n{{ $json.place_id }}\n{{ $json.company_name }}\n{{ $json.url }}\n{{ $json.contact_name }}\n{{ $json.phone }}\n{{ $json.email }}\n{{ $json.first_contact }}\n{{ $json.last_contact }}\n{{ $json.extra_info }}\n{{ $json.is_active }}\n{{ $json.is_closed }}\n{{ $json.is_contacted }}\n{{ $json.transcription }}\n{{ $json.CEO }}\n{{ $json.company_size_id }}\n{{ $json.industry_id }}\n{{ $json.origin_id }}\n{{ $json.created_at }}\n{{ $json.first_contacted_by }}\n{{ $json.last_contacted_by }}\n{{ $json.closed_by }}\n{{ $json.closed_at }}\n{{ $json.call_attempts }}\n{{ $json.scheduled }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -304,
+        48
+      ],
+      "id": "b7fa29f5-47b1-4de1-b699-de4475aba67b",
+      "name": "Revisor Individual DB Customer",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "GPT-3.5-TURBO"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Somos SmartCalls un empresa enfocada en la venta de automatizaciones conversacionales con IA para negocios. Estamos tratando de realizar un proyecto de marketing mediante llamadas con nuestro asistente de IA automatizado con N8N.\n\nTras realizar un estudio de nuestra base de datos, este es el reporte del análisis realizado por Chatgpt para tratar de mejorar nuestros servicios:\n\n{{ $json.aggregatedData }}\n\nQuiero que me indiques mediante un breve informe, todos los puntos importantes que tenemos que mejorar. "
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -160,
+        272
+      ],
+      "id": "6f68615f-2b23-4e8e-9179-ce746a7a8066",
+      "name": "Revisor Conjunto DB Contactcustomer",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "GPT-3.5-TURBO"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Somos SmartCalls un empresa enfocada en la venta de automatizaciones conversacionales con IA para negocios. Estamos tratando de realizar un proyecto de marketing mediante llamadas con nuestro asistente de IA automatizado con N8N.\n\nQuiero que compruebes los datos de la base de datos y me indiques brevemente si crees que los datos están bien almacenados, si crees que hay errores y si implementarias alguna mejora.\n\nEstos son los datos que tenemos almacenados en nuestra base de datos MySQL:\n{{ $json.place_id }}\n{{ $json.transcription }}\n{{ $json.created_at }}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -288,
+        400
+      ],
+      "id": "f87afc45-1161-4fc1-9902-493979b74c5b",
+      "name": "Revisor Individual DB Contactcustomer",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM contactcustomer LIMIT 10;",
+        "options": {}
+      },
+      "id": "9d65eca2-b55e-4ec8-8da0-639d397df320",
+      "name": "MySQL Tabla ContactCustomer",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        -704,
+        288
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "# Analizar Web",
+        "height": 260,
+        "width": 1180,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -784,
+        -528
+      ],
+      "typeVersion": 1,
+      "id": "8d97e4fd-3b89-4cf7-8e27-ef51f35b6590",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Analizar Base de Datos",
+        "height": 780,
+        "width": 1340,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -784,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "8b890280-95c4-4509-97a1-401fd0236dfa",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# Analizar Correo Electrónico",
+        "height": 260,
+        "width": 1180,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -784,
+        624
+      ],
+      "typeVersion": 1,
+      "id": "7382f6db-72a2-4a3e-acc5-82a04ab7adbb",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648",
+          "mode": "list",
+          "cachedResultName": "N8N Optima",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 977706087,
+          "mode": "list",
+          "cachedResultName": "Informe de Mejorías",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648/edit#gid=977706087"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Página Web": "={{ $('Limpiar Texto').item.json.cleanedText }}",
+            "ID": "0"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Página Web",
+              "displayName": "Página Web",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Base de Datos Customer",
+              "displayName": "Base de Datos Customer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Base de Datos ContactCustomer",
+              "displayName": "Base de Datos ContactCustomer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Correo Electrónico",
+              "displayName": "Correo Electrónico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        160,
+        -448
+      ],
+      "id": "4b10bbf1-48fd-4cf4-b6dc-0b4608008899",
+      "name": "Guardar Informe Web",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648",
+          "mode": "list",
+          "cachedResultName": "N8N Optima",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 977706087,
+          "mode": "list",
+          "cachedResultName": "Informe de Mejorías",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648/edit#gid=977706087"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "0",
+            "Promp Retell AI": "={{ $json.message.content }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Página Web",
+              "displayName": "Página Web",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Base de Datos Customer",
+              "displayName": "Base de Datos Customer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Base de Datos ContactCustomer",
+              "displayName": "Base de Datos ContactCustomer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Correo Electrónico",
+              "displayName": "Correo Electrónico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Promp Retell AI",
+              "displayName": "Promp Retell AI",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -416,
+        1008
+      ],
+      "id": "54d0b524-c2d7-4924-b51c-e45805df48bb",
+      "name": "Generar Informe4",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Analizar Promp Retell AI",
+        "height": 260,
+        "width": 1180,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -784,
+        928
+      ],
+      "typeVersion": 1,
+      "id": "cf6b2eda-4740-4b1c-8934-de3d20de0ac3",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "GPT-3.5-TURBO"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Somos SmartCalls un empresa enfocada en la venta de automatizaciones conversacionales con IA para negocios. Estamos tratando de realizar un proyecto de marketing mediante llamadas con nuestro asistente de IA automatizado con N8N.\n\nQuiero que revises el promp que utilizamos en Retell AI para realizar las llamadas y me digas que te parece, si ves algún error y en que aspectos se puede mejorar:\n\n###INSTRUCCIONES###\n\nEres Sofía, una asistente cálida, servicial, inteligente y profesional que hace llamadas para agendar citas en nombre de SmartCalls. Somos una agencia experta en inteligencia artificial para profesionales y empresas. Aprende y mejora constantemente tras cada interacción con cada llamada con clientes.\n\nTu objetivo principal es concertar una cita y ayudar al cliente con preguntas amigables y divertidas, para comprender mejor sus necesidades. \n\nSé cortés, conversacional y eficiente. Usa un tono alegre, tranquilo y acogedor.\n\nUsa la persuasión y la psicología de ventas para que el cliente necesite y desee probar nuestros servicios y agende la cita con uno de nuestros expertos. Usa siempre respuestas cortas que generen interés genuino por el cliente.\n\nTodo lo que hay entre paréntesis ( ) son ordenes para ti, Sofia. Es muy importante que tomes notas y preguntes datos relevantes de la empresa que estas llamando, como numero de trabajadores, numero de clientes, numero de llamadas o WhatsApp diarios para después ayudarnos a confeccionar un presupuesto ajustado. \n\nEn la Conversación Inicial: Haz preguntas abiertas para recopilar esta información de forma natural. \nPor ejemplo:\n\"Cuéntame, ¿Qué tareas te gustaría automatizar en tu día a día?\"\n\"¿Cuántas propiedades gestionas y cuántas consultas sueles recibir al día?\"\n\nComprueba disponibilidad para agendar una cita usando la función 'check_calendar_availability'. Ten en cuenta la fecha y la hora actual en Madrid. Reserva citas usando la función 'book_appointment'. Para finalizar la llamada usa la funcion 'end_call' No hace falta que cojas datos del cliente, a excepción del email para enviar la cita.\n\nMantén la conversación fluida y breve.\nSi preguntan precios: \"Depende de tus necesidades, pero en la cita nuestro experto te elaborará presupuesto ajustado a tu medida.\"\nSi piden detalles: \"Nuestra IA filtra leads, programa visitas y envía recordatorios, todo ajustado a tu negocio.\"\nSi te encuentras con un IVR ( Respuesta de Voz Interactiva) Pulsa el numero que solicite para hablar en castellano o departamento de ventas o atención al cliente.\n \n### FIN DE INSTRUCCIONES###\n\n### INTRODUCCION (CAPTAR LA ATENCION) ###\n\n\"Hola, soy Sofia, ¿Con quien hablo por favor? (toma nota del nombre y repíteselo de manera natural cada vez que vayas a preguntarle para dirigirte a la persona, no lo hagas todas las veces, solo 3 veces en la llamada)\n\nHola (nombre de la persona) Soy la asistente de SmartCalls, ¿Nos conoces?\n(seguramente te dirá que no, entonces sigues)\n\nPues (nombre de la persona) en SmartCalls nos dedicamos a potenciar empresas y profesionales como tú reduciendo el tiempo en tareas repetitivas con Inteligencia Artificial. ¿Tienes un par de minutos para que te cuente un poquito?\"\nSi te dice que si, continua. Si te dice que no, agenda una hora y día para llamar nuevamente.\n\n### IDENTIFICA NECESIDADES ###\n\n(Si dicen que sí, pregunta:)\n\"(nombre de la persona) ¿Te gustaría disponer de mas tiempo libre sin perder eficiencia en tu negocio?\"\n\n(Si dicen que sí, pregunta:)\n\"¿Qué te quita más tiempo? ¿Responder preguntas, coordinar visitas, gestionar clientes?\"\n\n### Luego explica: ###\n\n\"Nuestros agentes de IA pueden contestar consultas especificas sobre tus productos o servicios, también tomar notas del tipo de cliente y puede dar y tomar detalles importantes, filtrar leads serios y programar visitas automáticamente, 24/7, manteniendo un trato profesional y eficiente con tus clientes.\"\n\n(Si lo ves interesado/a cuéntale acerca de los siguientes beneficios :)\n\nBeneficios específicos para su agencia inmobiliaria:\n\n• Aumenta la conversión de clientes potenciales a visitas de ventas hasta en un 40 % más.\n• Automatiza la programación de citas y el seguimiento de clientes interesados.\n• Facilita la adquisición de propietarios que desean vender o alquilar.\n• Reduce significativamente el tiempo dedicado a tareas repetitivas, liberando a sus vendedores para tareas estratégicas.\n• Mejora la satisfacción y la fidelización del cliente.\n• Se integra rápidamente con su CRM o ERP actual.\n• Aprende y mejora constantemente tras cada interacción con sus clientes.\n• Le ofrece un claro retorno de la inversión desde el primer uso.\n\n### Despertar Interés (Beneficios Claros) ###\n\n\"Imagina tener menos llamadas repetitivas y más tiempo para negociar. Nuestra solución automatiza esas tareas sin perder el toque personal que tus clientes valoran. Muchos empresarios como tú, han reducido su carga operativa en un 40% con este servicio.\"\n\n### Llamado a la Acción (Cerrar Reunión) ###\n\n\"¿Te gustaría que un experto te muestre más en una llamada rápida de unos minutos?\" (recoge correo y teléfono para agendar)\nPodrás ver cómo se adapta a tu día a día y te ahorra tiempo. (Mira el calendario con ´check_calendar_availability' y Agenda una reunión ) \"¿Cuando te va bien para agendar una cita 'book_appointment'?\"\n\n### Si No Están Interesados ###\n\n(nombre de la persona) Gracias por tu tiempo. Te enviaremos un email por si más adelante quieres explorar cómo la IA puede potenciar tu trabajo, también puedes visitar nuestra web SmartCalls punto Biz. ¡Te deseamos mucho EXITO con tus negocios!  \n\n\n\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -768,
+        1008
+      ],
+      "id": "322c2339-d016-493d-a95f-fa18a4b519f1",
+      "name": "Revisor Promp Retell",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "MySQL Tabla Customer": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Revisor Individual DB Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "dataDownload",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "MySQL Tabla Customer",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Revisor Correos Electrónicos",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "MySQL Tabla ContactCustomer",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Revisor Promp Retell",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "dataDownload": {
+      "main": [
+        [
+          {
+            "node": "Revisor Web",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Revisor Conjunto DB Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revisor Web": {
+      "main": [
+        [
+          {
+            "node": "Limpiar Texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Generar Informe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Guardar Informe Web",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limpiar Texto": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revisor Correos Electrónicos": {
+      "main": [
+        [
+          {
+            "node": "Generar Informe3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Revisor Individual DB Contactcustomer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Revisor Conjunto DB Contactcustomer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "Generar Informe2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revisor Conjunto DB Customer": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revisor Individual DB Customer": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revisor Conjunto DB Contactcustomer": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revisor Individual DB Contactcustomer": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL Tabla ContactCustomer": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revisor Promp Retell": {
+      "main": [
+        [
+          {
+            "node": "Generar Informe4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "895ae2d7-d824-4933-8829-4f509f3ef27c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "91e9bc2fd2d08736422cccee7e1506bda336e368f82dcb792c9d1bbf6348503c"
+  },
+  "id": "udVknCbQLpicxsJY",
+  "tags": []
+}

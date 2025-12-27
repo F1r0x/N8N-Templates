@@ -1,0 +1,1803 @@
+{
+  "name": "✅🟦 Generador de Publicaciones Wordpress 1.0",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "=https://serpapi.com/search?engine=google&q={{ $json.Titulo }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "serpApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        352,
+        704
+      ],
+      "id": "8bb68300-9c41-49e6-8fef-c1f666c900c1",
+      "name": "SerpAPI",
+      "credentials": {
+        "serpApi": {
+          "id": "x87Jb44THl5aN74Z",
+          "name": "SerpAPI Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Por cada item, extraemos el link y lo renombramos a \"url\"\nreturn items.map((item, index) => ({\n  json: {\n    id: `${index + 1}`,\n    url: $input.first().json.link\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        704
+      ],
+      "id": "45fc6589-bf32-470a-83cf-a881e8bbead0",
+      "name": "UrlExtract"
+    },
+    {
+      "parameters": {
+        "content": "## Buscar Artículos con  SerpAPI y filtrar contenido\n\n\n",
+        "height": 200,
+        "width": 580,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        272,
+        640
+      ],
+      "typeVersion": 1,
+      "id": "a29e8004-6dd6-4a3d-87a1-a4ff39f1ebfc",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items[0].json[\"articles\"].map(article => {\n  return {\n    json: {\n      id: article.id,\n      content: article.content\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        992
+      ],
+      "id": "a31f11a4-1e2c-45f7-8e68-dbbfa90c63b4",
+      "name": "simpleList"
+    },
+    {
+      "parameters": {
+        "content": "#### JSON Modify\n",
+        "height": 220,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        112,
+        928
+      ],
+      "typeVersion": 1,
+      "id": "f88812e4-182e-401e-997c-26db7c545862",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "#### Valoración de Artículos\n",
+        "height": 380,
+        "width": 560,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        448,
+        928
+      ],
+      "typeVersion": 1,
+      "id": "61086b6f-a864-4058-a712-72b098afff89",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    content: items[0].json.choices[0].message.content\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1264,
+        960
+      ],
+      "id": "65b9993b-59e5-42f4-9b64-99fb4a0c452e",
+      "name": "contentFilter"
+    },
+    {
+      "parameters": {
+        "content": "#### Artículo mejor valorado \n",
+        "height": 200,
+        "width": 360
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1024,
+        928
+      ],
+      "typeVersion": 1,
+      "id": "1719c978-0c06-43bc-a00c-d6b26f6f4edf",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "#### Descarga el artículo mejor valorado\n",
+        "height": 200,
+        "width": 360,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1392,
+        688
+      ],
+      "typeVersion": 1,
+      "id": "4e459f8b-72b1-4860-aed5-6feb281bb56b",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-4o\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Quiero que me conviertas el contenido en formato JSON con las claves id, puntuacion y resumen.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Este es el artículo que tienes que estructurar en formato JSON:\\n\\n{{ $json.content }}\"\n    }\n  ],\n  \"max_tokens\": 100,\n  \"temperature\": 0.7\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1600,
+        960
+      ],
+      "id": "8db7327e-635f-4845-8d80-aaeaf8e91207",
+      "name": "ConsultaGlobalChatGPT",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{$json[\"url\"]}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Firefox/120.0"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "redirect": {
+            "redirect": {
+              "maxRedirects": 10
+            }
+          },
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "text"
+            }
+          },
+          "timeout": 60000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1600,
+        720
+      ],
+      "id": "6fe5ecf6-60aa-4bb2-818a-d5866895476a",
+      "name": "dataDownload2",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "content": "#### dataJSON",
+        "height": 240,
+        "width": 340
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1424,
+        928
+      ],
+      "typeVersion": 1,
+      "id": "4777788c-c8da-4218-aef4-f2338bb02464",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('UrlExtract').item.json.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Firefox/120.0"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "redirect": {
+            "redirect": {
+              "maxRedirects": 5
+            }
+          },
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          },
+          "timeout": 120000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1168,
+        720
+      ],
+      "id": "3e6d9065-d60d-4432-a17d-531352145d73",
+      "name": "dataDownload",
+      "retryOnFail": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "amount": 0
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        992,
+        528
+      ],
+      "id": "6a203071-2dfd-459c-bc4f-c260d4eae79d",
+      "name": "Wait",
+      "webhookId": "798af36a-c6e1-4605-b910-b3b9aa0a8960"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "choices[0].message.content",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        960
+      ],
+      "id": "8ee3fb2b-4ff3-4257-b40c-27ce12ecf5f0",
+      "name": "Filtra Resultado1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  // Extraer el contenido, con valor por defecto si no existe\n  const rawContent = item.json[\"choices[0].message.content\"] || '';\n\n  // Si no hay contenido, devolver un objeto vacío o manejar el error\n  if (!rawContent) {\n    return { json: {} };\n  }\n\n  // Procesar la cadena solo si existe\n  const jsonString = rawContent\n    .replace(/```json\\n?/, '')  // Quita ```json y salto de línea opcional\n    .replace(/```\\n?/, '')      // Quita ``` y salto de línea opcional\n    .trim();                    // Limpia espacios en blanco\n\n  // Parsear la cadena JSON a un objeto\n  const parsedJson = JSON.parse(jsonString);\n\n  return {\n    json: parsedJson\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1984,
+        960
+      ],
+      "id": "35be4652-1c92-4ab0-95b4-6e4b79cc502c",
+      "name": "JSONclean"
+    },
+    {
+      "parameters": {
+        "content": "#### export JSON\n",
+        "height": 240,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1792,
+        928
+      ],
+      "typeVersion": 1,
+      "id": "bce67b1e-a631-484a-b10d-461f4b906b0e",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      content: $json[\"content\"].replace(/\\n/g, \" \")\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        960
+      ],
+      "id": "5e687a32-29e1-4767-84dc-55966fab6117",
+      "name": "cleanData"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=gpt-4o",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Revisa el artículo: {{ $json.article }}\n\nQuiero que me indiques que palabras de poder SEO utiliza. Muestrame en una única lista, las palabras (No quiero que me pases nada más que las palabras)."
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 2048
+        }
+      },
+      "id": "e6986d2e-4543-46cf-8c17-669ba80a6867",
+      "name": "PowerWordsExtract",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        1968,
+        720
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=gpt-4o",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Eres un redactor SEO y necesitas encontrar un título de máximo 60 caracteres para el siguiente artículo: {{ $json.message.content }}\n\nInstrucciones: - Utilizar las palabras clave contenidas en el artículo - No utilices ningún carácter HTML - Genera solo la cadena que contiene el título. - No utilices comillas. "
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 2048
+        }
+      },
+      "id": "a1103488-3277-4ac5-bc07-97ab6ba5ab84",
+      "name": "Generate title",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        2288,
+        720
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=gpt-4o",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Genera un artículo de 900 a 1000 palabras para un blog sobre inteligencia artificial, basado en las palabras clave: {{ $json.message.content }}.  \nLa introducción debe tener unas 60 palabras, presentar el tema central que se desarrollará en el artículo y evitar títulos.\nEscribe 1-2 capítulos con títulos en <h3></h3>, relacionados entre sí, con un flujo lógico y sin repetir ideas. Usa <p style=\"text-align: justify;text-justify: inter-word;\"></p> para el contenido y resalta las frases más importantes con <strong></strong> (no con caracteres como \"**\").\nLa conclusión, de unas 60 palabras, debe resumir el artículo, como párrafo independiente sin empezar con \"En conclusión,\". \n\n"
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 2048
+        }
+      },
+      "id": "f7448201-876b-49d1-ae0f-caf73327b81d",
+      "name": "Generate article",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        2128,
+        720
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Create metatitle and metadescription in the language of the following product:\n- Title: {{ $('Generate title').item.json.message.content }}\n- Content: {{ $('Generate article').item.json.message.content }}\n",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are an expert SEO content optimizer specialized in creating meta tags for both web pages and blog articles. Your task is to analyze the provided content and generate optimized meta tags based on the content type.\n\nMETA TAG REQUIREMENTS:\n\n1. Meta Title (max 60 characters):\n   - Include primary keyword near the beginning\n   - State the main value proposition\n   - Include brand name when relevant\n   - Use action-oriented language for commercial pages\n   - Format: Primary Keyword | Main Benefit | Brand (if applicable)\n\n2. Meta Description (max 160 characters):\n   - Lead with unique selling proposition\n   - Include primary and secondary keywords naturally\n   - Add clear call-to-action\n   - Highlight key benefits or features\n   - Address user pain points\n   - Tease the main insights or findings\n   - Mention key topics covered\n   - Use engaging question or statement\n   - Include expertise indicators\n   - Promise value or solution\n\nANALYSIS PROCESS:\n1. Content Assessment:\n   - Identify content type and purpose\n   - Extract main topic and keywords\n   - Determine search intent\n   - Identify target audience\n   - Note key differentiators\n\n2. Optimization Strategy:\n   - Align with search intent\n   - Consider competition level\n   - Factor in brand guidelines\n   - Account for content freshness\n   - Optimize for click-through rate\n\nOUTPUT FORMAT:\nPlease provide meta tags in the required format\n\nVALIDATION CHECKLIST:\n- Title length ≤ 60 characters\n- Description length ≤ 160 characters\n- Primary keyword included in both\n- Matches identified search intent\n- Appropriate for content type\n- Clear value proposition\n- Compelling call-to-action\n- Natural keyword placement\n- Proper grammar and spelling\n- Mobile display optimized\n- Don't use placeholder\n\nBEST PRACTICES:\n- Avoid clickbait or misleading content\n- Use power words appropriately\n- Maintain brand voice and tone\n- Ensure mobile snippet optimization\n- Consider local SEO when relevant\n- Keep seasonal content timely\n- Use numbers and data when available\n- Include price/offers if applicable\n- Add emotional triggers when appropriate\n- Consider SERP feature optimization\n\nTECHNICAL GUIDELINES:\n- No double quotes in meta description\n- Avoid unnecessary special characters\n- Use UTF-8 encoding\n- Capitalize properly\n- Avoid keyword cannibalization\n- Respect brand guidelines\n- Consider local market variations\n- Update meta tags for seasonal content\n- Monitor CTR performance\n- A/B test when possible\n\nRemember: The goal is to create meta tags that serve both search engines and users effectively while maintaining specificity for the content type and maximizing organic click-through rates."
+            }
+          ]
+        }
+      },
+      "id": "8307fa45-7e72-450c-bdd0-43df689f1c43",
+      "name": "SEO Expert",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        2464,
+        720
+      ],
+      "typeVersion": 1.5
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "=\"Generate an image for my next blog post, without text. Image description: A realistic scene inspired by '{{ $('Generate title').item.json.message.content }}', with high-quality detail.\"\n\n",
+        "options": {
+          "size": "1024x1024",
+          "style": "natural"
+        }
+      },
+      "id": "dfd9633a-2091-4996-9ec5-21904656f501",
+      "name": "Generate image",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        1312,
+        1248
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Creación de Artículos",
+        "height": 220,
+        "width": 620,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1792,
+        672
+      ],
+      "typeVersion": 1,
+      "id": "1f88ffa0-fb9e-4151-b271-530ea70599d2",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## SEO",
+        "height": 400,
+        "width": 300,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2448,
+        512
+      ],
+      "typeVersion": 1,
+      "id": "b40da3b4-62e6-4b05-9449-7e5199e1140b",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-4o\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Iniciará mostrando el ID del artículo que estamos evaluando (Muestralo al principio con el siguiente formato ID: Número correspondiente), seguido de la PUNTUACION (Será un número entero del 0 al 10) y finalmente un RESUMEN (El resumen serán las 10 primeras palabras del artículo). Eres un evaluador de artículos, evalúa este artículo del 1 al 10 basado en su calidad general, claridad y utilidad. La puntuación debe ser un número entero entre 1 y 10.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Aquí está el artículo para evaluar:\\n\\nID: {{ $json.id }}\\nContenido: {{ $json.content }}\"\n    }\n  ],\n  \"max_tokens\": 100,\n  \"temperature\": 0.7\n}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        688,
+        1104
+      ],
+      "id": "b3181552-f352-408c-9af3-d9a730126edb",
+      "name": "ValoradorArticulos",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-4o\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Manten el formato de ID, PUNTUACION Y RESUMEN). Dime cuál es el artículo con la puntuación más alta basándote en las puntuaciones proporcionadas en el texto. Muestrame el mensaje original con su ID correspondiente. No muestres ningún mesaje adicional, unicamente devuelve el mejor en el formato indicado y utilizado en el content.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Aquí están los artículos para evaluar:\\n\\n{{ $json.formattedInput }}\"\n    }\n  ],\n  \"max_tokens\": 200,\n  \"temperature\": 0.7\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1088,
+        960
+      ],
+      "id": "66c52b55-f38c-4ca3-b82c-a136c223ad53",
+      "name": "MejorArticulo",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1070e590-c900-43c1-8290-69bf9e6aa27c",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "number"
+            },
+            {
+              "id": "8dfc69ef-046a-4c58-a36d-608deae24769",
+              "name": "url",
+              "value": "={{ $json.url }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1152,
+        528
+      ],
+      "id": "810ecc1a-8d66-4e10-b49e-b4b47f1f0a9b",
+      "name": "StringToNumber"
+    },
+    {
+      "parameters": {
+        "content": "### Cambiar ID de String a Number",
+        "height": 200,
+        "width": 340
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        944,
+        480
+      ],
+      "typeVersion": 1,
+      "id": "054f1f96-2ea6-4886-af50-6be4baebc9e4",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "### Publicar Artículo en Wordpress\n",
+        "height": 240,
+        "width": 180,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2752,
+        640
+      ],
+      "typeVersion": 1,
+      "id": "6611fd37-af28-43e6-8bc4-5f7176967ed1",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "title": "={{ $('Generate title').item.json.message.content }}",
+        "additionalFields": {
+          "content": "=={{ $('Generate article').item.json.message.content }}{{ $json.output.metadescription }}",
+          "status": "publish",
+          "categories": [
+            24
+          ]
+        }
+      },
+      "id": "f4079618-a9b7-4ede-a7f1-76b9365e9c76",
+      "name": "AddPostToWP",
+      "type": "n8n-nodes-base.wordpress",
+      "position": [
+        2784,
+        720
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "wordpressApi": {
+          "id": "teUGGLMVTYrw7lVa",
+          "name": "Wordpress Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"metatitle\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"metadescription\": {\n\t\t\t\"type\": \"string\"\n\t\t}\n\t}\n}"
+      },
+      "id": "1e86a45a-cd4f-4f0c-9c9d-01c009c63121",
+      "name": "Structured Output",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        2624,
+        608
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2464,
+        608
+      ],
+      "id": "d3e722e6-4f0d-45b7-8561-ff822713f70c",
+      "name": "Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://optimaquantum.com/wp-json/wp/v2/media",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "wordpressApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "alt_text"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Disposition",
+              "value": "=attachment; filename=\"copertina-{{ $('AddPostToWP').item.json.id }}.jpg\""
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "id": "e09969f8-e1f3-46f7-bd67-54da16b5580e",
+      "name": "Update Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1520,
+        1248
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "wordpressApi": {
+          "id": "teUGGLMVTYrw7lVa",
+          "name": "Wordpress Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://optimaquantum.com/wp-json/wp/v2/posts/{{ $('AddPostToWP').item.json.id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "wordpressApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "featured_media",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0589da45-9d23-4018-97c0-03c5cab96fa2",
+      "name": "Post Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1728,
+        1248
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "wordpressApi": {
+          "id": "teUGGLMVTYrw7lVa",
+          "name": "Wordpress Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "### Generar y publicar Portada",
+        "height": 220,
+        "width": 600,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1264,
+        1184
+      ],
+      "typeVersion": 1,
+      "id": "dd09d1e0-29a3-412b-b33c-8dc07c00d61a",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://optimaquantum.com/wp-json/wp/v2/posts/{{ $('AddPostToWP').item.json.id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "wordpressApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"meta\": {\n    \"wpseo_title\": \"{{ $('SEO Expert').item.json.output.metatitle }}\",\n    \"wpseo_metadesc\": \"{{ $('SEO Expert').item.json.output.metadescription }}\"\n  },\n  \"excerpt\": \"{{ $('SEO Expert').item.json.output.metadescription }}\"\n}",
+        "options": {}
+      },
+      "id": "a1972ae8-3eb4-4ba2-8b12-21a8f9c0c964",
+      "name": "CrearMetaDescripcion",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2800,
+        1344
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "wordpressApi": {
+          "id": "teUGGLMVTYrw7lVa",
+          "name": "Wordpress Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        112,
+        688
+      ],
+      "id": "a26d8ea6-c77b-4e06-bfbe-c1e98f15df2f",
+      "name": "loopArticles"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "related_questions",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        512,
+        704
+      ],
+      "id": "e68ccad6-217e-4bbd-9ccd-210b9d947bc2",
+      "name": "filterResults"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        912,
+        704
+      ],
+      "id": "77da3a38-f582-47ea-8e25-9c5e2258ddce",
+      "name": "loopDownloads"
+    },
+    {
+      "parameters": {
+        "jsCode": "const articles = (Array.isArray(items) ? items : []).map((item, index) => {\n  let htmlContent = item?.json?.[\"data\"] ?? \"Contenido no encontrado\";\n\n  // 1. Eliminar scripts, estilos y comentarios\n  htmlContent = htmlContent\n    .replace(/<script[^>]*>[\\s\\S]*?<\\/script>/gi, \"\")\n    .replace(/<style[^>]*>[\\s\\S]*?<\\/style>/gi, \"\")\n    .replace(/<!--[\\s\\S]*?-->/g, \"\");\n\n  // 2. Eliminar etiquetas HTML\n  let cleanText = htmlContent.replace(/<[^>]+>/g, \" \");\n\n  // 3. Eliminar texto basura común\n  const palabrasBasura = [\n    \"Menú principal\", \"Navegación\", \"Buscar\", \"Donaciones\", \"Acceder\",\n    \"Herramientas personales\", \"Páginas especiales\", \"Contribuciones\",\n    \"Discusión\", \"Página aleatoria\", \"Más información\"\n  ];\n  palabrasBasura.forEach(palabra => {\n    cleanText = cleanText.replace(new RegExp(`\\\\b${palabra}\\\\b`, \"gi\"), \"\");\n  });\n\n  // 4. Normalizar espacios en blanco y limpiar texto\n  cleanText = cleanText.replace(/\\s+/g, \" \").trim();\n\n  // 5. Resumir a 200 palabras\n  const summary = cleanText.split(\" \").slice(0, 200).join(\" \");\n\n  return {\n    id: `${index + 1}`,\n    content: summary\n  };\n});\n\nreturn [{ json: { articles } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        128,
+        992
+      ],
+      "id": "cddca7a1-1e5e-4d1d-bb40-db7f35a914e6",
+      "name": "processArticles"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        512,
+        992
+      ],
+      "id": "49e3bbc2-53d9-40aa-999b-a78f8cd7bd99",
+      "name": "loopValuations"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filtra ítems válidos y los formatea correctamente\nconst validItems = $input.all()\n  .filter(item => item.json['choices[0].message.content']) // Elimina ítems vacíos\n  .map(item => item.json['choices[0].message.content'].replace(/\\n/g, '\\\\n')); // Escapa saltos de línea\n\n// Devuelve un solo string con los ítems concatenados\nreturn [{\n  json: {\n    formattedInput: validItems.join('\\\\n\\\\n')\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        848,
+        960
+      ],
+      "id": "4168d052-02ba-4d3c-9cd2-25fb72ef7577",
+      "name": "listReviews"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "choices[0].message.content",
+        "include": "=",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        848,
+        1104
+      ],
+      "id": "0f3c4f40-3414-4e96-99f6-9793e1bb4b28",
+      "name": "filterContent"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "fieldsToMatchString": "id",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1440,
+        720
+      ],
+      "id": "c8f16b1f-58d9-4001-9b29-c6b43e892ef0",
+      "name": "Merge",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "jsCode": "const articles = (Array.isArray(items) ? items : []).map((item, index) => {\n  // Obtener el contenido HTML del campo \"data\"\n  let htmlContent = item?.json?.[\"data\"] ?? \"Contenido no encontrado\";\n\n  // 1. Eliminar scripts, estilos y comentarios\n  htmlContent = htmlContent\n    .replace(/<script[^>]*>[\\s\\S]*?<\\/script>/gi, \"\") // Elimina scripts\n    .replace(/<style[^>]*>[\\s\\S]*?<\\/style>/gi, \"\")   // Elimina estilos\n    .replace(/<!--[\\s\\S]*?-->/g, \"\");                // Elimina comentarios HTML\n\n  // 2. Eliminar todas las etiquetas HTML y dejar solo el texto\n  let cleanText = htmlContent.replace(/<[^>]+>/g, \" \");\n\n  // 3. Normalizar espacios en blanco y limpiar el texto\n  cleanText = cleanText.replace(/\\s+/g, \" \").trim();\n\n  // Devolver solo el contenido limpio\n  return {\n    json: {\n      article: cleanText\n    }\n  };\n});\n\nreturn articles;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1808,
+        720
+      ],
+      "id": "d6674620-6794-4739-9c99-602201e4c05a",
+      "name": "processArticles1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener el contenido del artículo desde $json.message.content\nconst content = $json.message?.content || \"No hay contenido disponible\";\n\n// Dividir el contenido en párrafos usando las etiquetas <p> como separador\nconst paragraphRegex = /<p[^>]*>(.*?)<\\/p>/g;\nconst paragraphs = [];\nlet match;\nwhile ((match = paragraphRegex.exec(content)) !== null) {\n  paragraphs.push(match[1]); // Extraer el contenido dentro de las etiquetas <p>\n}\n\n// Filtrar párrafos vacíos y asegurarse de que haya al menos 2\nconst validParagraphs = paragraphs.filter(p => p.trim().length > 0);\n\n// Verificar si existe un segundo párrafo\nconst secondParagraph = validParagraphs.length > 1 ? validParagraphs[1] : \"No hay segundo párrafo disponible\";\n\n// Devolver el resultado como un nuevo ítem\nreturn [{\n  json: {\n    id: $json.index, // Usamos \"index\" como ID, ya que \"id\" no está presente\n    secondParagraph: secondParagraph\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2192,
+        944
+      ],
+      "id": "4077384b-af28-4ed4-baec-d7b002e21338",
+      "name": "extraerSegundoParrafo"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "=\"Generate an image for my next blog post, without text. Image description: A realistic scene inspired by '{{ $('Generate title').item.json.message.content }}', with high-quality detail.\"\n",
+        "options": {
+          "size": "1024x1024",
+          "style": "natural"
+        }
+      },
+      "id": "56f0f099-adc2-4e23-b22b-18b06e90f564",
+      "name": "generarSegundaImg",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        2384,
+        944
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener el contenido del artículo desde $json.message.content\nconst content = $json.message?.content || \"No hay contenido disponible\";\n\n// Dividir el contenido en párrafos usando las etiquetas <p> como separador\nconst paragraphRegex = /<p[^>]*>(.*?)<\\/p>/g;\nconst paragraphs = [];\nlet match;\nwhile ((match = paragraphRegex.exec(content)) !== null) {\n  paragraphs.push(match[1]); // Extraer el contenido dentro de las etiquetas <p>\n}\n\n// Filtrar párrafos vacíos y asegurarse de que haya al menos 3\nconst validParagraphs = paragraphs.filter(p => p.trim().length > 0);\n\n// Verificar si existe un tercer párrafo\nconst thirdParagraph = validParagraphs.length > 2 ? validParagraphs[2] : \"No hay tercer párrafo disponible\";\n\n// Devolver el resultado como un nuevo ítem\nreturn [{\n  json: {\n    id: $json.index, // Usamos \"index\" como ID, ya que \"id\" no está presente\n    thirdParagraph: thirdParagraph\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2192,
+        1152
+      ],
+      "id": "e7d34cc3-7b75-4f18-a23a-f4b73ec87316",
+      "name": "extraerTercerParrafo"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "=\"Generate an image for my next blog post, without text. Image description: A realistic scene inspired by '{{ $('Generate title').item.json.message.content }}', with high-quality detail.\"\n\n",
+        "options": {
+          "size": "1024x1024",
+          "style": "natural"
+        }
+      },
+      "id": "943cc3af-eefa-4232-bde9-0e5202e6ffdb",
+      "name": "generarTerceraImg",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        2384,
+        1152
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://optimaquantum.com/wp-json/wp/v2/media",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "wordpressApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "alt_text"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Disposition",
+              "value": "=attachment; filename=\"secondary1-{{ $('AddPostToWP').item.json.id }}.jpg\""
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "id": "01c2ea8a-5ac9-4ab5-9d01-6e764166219e",
+      "name": "subirTerceraIMG",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2592,
+        1152
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "wordpressApi": {
+          "id": "teUGGLMVTYrw7lVa",
+          "name": "Wordpress Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://optimaquantum.com/wp-json/wp/v2/media",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "wordpressApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "alt_text"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Disposition",
+              "value": "=attachment; filename=\"secondary1-{{ $('AddPostToWP').item.json.id }}.jpg\""
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "id": "b4cd742c-114b-4be3-92ff-673c1b5d5a43",
+      "name": "subirSegundaIMG",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2592,
+        944
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "wordpressApi": {
+          "id": "teUGGLMVTYrw7lVa",
+          "name": "Wordpress Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const content = $('Generate article').item.json.message.content || 'Contenido no encontrado';\nconst secondary1Url = $('subirSegundaIMG').item.json.link || 'URL1 no encontrada';\nconst secondary2Url = $('subirTerceraIMG').item.json.link || 'URL2 no encontrada';\n\n// Dividir el contenido en párrafos\nconst paragraphs = content.split('</p>').filter(p => p.trim().length > 0);\n\n// Crear una nueva lista de elementos para incluir imágenes entre párrafos\nconst updatedParagraphs = [];\nfor (let i = 0; i < paragraphs.length; i++) {\n  // Agregar el párrafo actual completo\n  updatedParagraphs.push(paragraphs[i]);\n  \n  // Insertar la primera imagen después del tercer párrafo (índice 2)\n  if (i === 2 && paragraphs.length > 2) {\n    updatedParagraphs.push(`<img src=\"${secondary1Url}\" alt=\"Imagen secundaria 1\" style=\"max-width: 300px; height: auto; display: block; margin: 0 auto;\" />`);\n  }\n  \n  // Insertar la segunda imagen después del cuarto párrafo (índice 3)\n  if (i === 3 && paragraphs.length > 3) {\n    updatedParagraphs.push(`<img src=\"${secondary2Url}\" alt=\"Imagen secundaria 2\" style=\"max-width: 300px; height: auto; display: block; margin: 0 auto;\" />`);\n  }\n}\n\n// Unir los párrafos y las imágenes con </p> solo para los párrafos originales\nconst updatedContent = updatedParagraphs.map(item => {\n  // Si el elemento es una imagen, no agregar </p>\n  if (item.includes('<img')) return item;\n  return `${item}</p>`;\n}).join('\\n');\n\n// Escapar el contenido para JSON\nconst escapedContent = updatedContent.replace(/\"/g, '\\\\\"').replace(/\\n/g, '\\\\n');\n\nconsole.log('Contenido original:', content);\nconsole.log('Contenido escapado:', escapedContent);\n\nreturn [{ json: { content: escapedContent, postId: $('AddPostToWP').item.json.id || 0 } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2192,
+        1344
+      ],
+      "id": "49c0c67e-3935-4a94-a3c1-d9d7b5581803",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b49b817e-1a7a-483a-bcd9-3a66ba3317a6",
+              "name": "body",
+              "value": "={\"content\": \"{{ $('Code1').item.json.content }}\"}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2384,
+        1344
+      ],
+      "name": "PrepareBody1",
+      "id": "6211d633-7bec-4bc9-8a9b-72675bbee0b5"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://optimaquantum.com/wp-json/wp/v2/posts/{{ $('Code1').item.json.postId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "wordpressApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('PrepareBody1').item.json.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2608,
+        1344
+      ],
+      "id": "6eb56996-96bc-43dc-8284-bc42cbaefe72",
+      "name": "HTTP Request1",
+      "credentials": {
+        "wordpressApi": {
+          "id": "teUGGLMVTYrw7lVa",
+          "name": "Wordpress Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 10
+            },
+            {
+              "triggerAtHour": 16
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -304,
+        688
+      ],
+      "id": "57ea5bb9-9376-45ce-b840-a7cfb22534ee",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg",
+          "mode": "list",
+          "cachedResultName": "Artículos Wordpress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Artículos Varios",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit#gid=0"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1952,
+        1248
+      ],
+      "id": "c8fd779d-14b8-4358-806f-42461d0a3b38",
+      "name": "Eliminar Título Creado",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg",
+          "mode": "list",
+          "cachedResultName": "Artículos Wordpress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Numeración de IDs de Artículos Wordpress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -96,
+        688
+      ],
+      "id": "daaf929a-8961-4bce-81ac-eed9cae3e66a",
+      "name": "Títulos Artículos",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "SerpAPI": {
+      "main": [
+        [
+          {
+            "node": "filterResults",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UrlExtract": {
+      "main": [
+        [
+          {
+            "node": "loopDownloads",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "simpleList": {
+      "main": [
+        [
+          {
+            "node": "loopValuations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "contentFilter": {
+      "main": [
+        [
+          {
+            "node": "cleanData",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ConsultaGlobalChatGPT": {
+      "main": [
+        [
+          {
+            "node": "Filtra Resultado1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "dataDownload2": {
+      "main": [
+        [
+          {
+            "node": "processArticles1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "dataDownload": {
+      "main": [
+        [
+          {
+            "node": "loopDownloads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "StringToNumber",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtra Resultado1": {
+      "main": [
+        [
+          {
+            "node": "JSONclean",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JSONclean": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cleanData": {
+      "main": [
+        [
+          {
+            "node": "ConsultaGlobalChatGPT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PowerWordsExtract": {
+      "main": [
+        [
+          {
+            "node": "Generate article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate title": {
+      "main": [
+        [
+          {
+            "node": "SEO Expert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate article": {
+      "main": [
+        [
+          {
+            "node": "Generate title",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SEO Expert": {
+      "main": [
+        [
+          {
+            "node": "AddPostToWP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate image": {
+      "main": [
+        [
+          {
+            "node": "Update Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ValoradorArticulos": {
+      "main": [
+        [
+          {
+            "node": "filterContent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MejorArticulo": {
+      "main": [
+        [
+          {
+            "node": "contentFilter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "StringToNumber": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "AddPostToWP": {
+      "main": [
+        [
+          {
+            "node": "extraerSegundoParrafo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "SEO Expert",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "SEO Expert",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Image": {
+      "main": [
+        [
+          {
+            "node": "Post Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post Image": {
+      "main": [
+        [
+          {
+            "node": "Eliminar Título Creado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CrearMetaDescripcion": {
+      "main": [
+        [
+          {
+            "node": "Generate image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "loopArticles": {
+      "main": [
+        [],
+        [
+          {
+            "node": "SerpAPI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "filterResults": {
+      "main": [
+        [
+          {
+            "node": "UrlExtract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "loopDownloads": {
+      "main": [
+        [
+          {
+            "node": "processArticles",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "dataDownload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "processArticles": {
+      "main": [
+        [
+          {
+            "node": "simpleList",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "loopValuations": {
+      "main": [
+        [
+          {
+            "node": "listReviews",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ValoradorArticulos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "listReviews": {
+      "main": [
+        [
+          {
+            "node": "MejorArticulo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "filterContent": {
+      "main": [
+        [
+          {
+            "node": "loopValuations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "dataDownload2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "processArticles1": {
+      "main": [
+        [
+          {
+            "node": "PowerWordsExtract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "extraerSegundoParrafo": {
+      "main": [
+        [
+          {
+            "node": "generarSegundaImg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generarSegundaImg": {
+      "main": [
+        [
+          {
+            "node": "subirSegundaIMG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "extraerTercerParrafo": {
+      "main": [
+        [
+          {
+            "node": "generarTerceraImg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generarTerceraImg": {
+      "main": [
+        [
+          {
+            "node": "subirTerceraIMG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "subirSegundaIMG": {
+      "main": [
+        [
+          {
+            "node": "extraerTercerParrafo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "subirTerceraIMG": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "PrepareBody1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PrepareBody1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "CrearMetaDescripcion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Títulos Artículos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Eliminar Título Creado": {
+      "main": [
+        [
+          {
+            "node": "Títulos Artículos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Títulos Artículos": {
+      "main": [
+        [
+          {
+            "node": "loopArticles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Madrid",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "46a52a0a-6dba-4dd2-a7f3-0963d9b8e785",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "91e9bc2fd2d08736422cccee7e1506bda336e368f82dcb792c9d1bbf6348503c"
+  },
+  "id": "FlMBINCBLUBT4zsr",
+  "tags": []
+}

@@ -1,0 +1,68 @@
+{
+  "name": "❗❗Notificador de Errores❗❗",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        -64
+      ],
+      "id": "634f5fa6-2df4-489f-8ed4-f63e6247c061",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "fromEmail": "no-reply@smartcalls.biz",
+        "toEmail": "=patrick.optimaquantum@gmail.com",
+        "subject": "Error en N8N",
+        "emailFormat": "text",
+        "text": "=Error en el N8N: {{ $json.workflow.name }}\nID: {{ $json.workflow.id }}\n\nÚltimo Nodo Ejecutado: {{ $json.execution.lastNodeExecuted }}\n\nMensaje de Error: {{ $json.execution.error.message }}\n\nURL Workflow: {{ $json.execution.url }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -96,
+        -64
+      ],
+      "id": "e5131cd1-dfdb-4ee9-baba-abc4944cc783",
+      "name": "Send Email",
+      "webhookId": "0b43fc2b-4701-4efc-8026-58f198cf4082",
+      "credentials": {
+        "smtp": {
+          "id": "Dx9eTPsVTPlyb1CQ",
+          "name": "SMTP SmartCalls"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "854b01ec-1893-4104-92c9-3f556220d7c9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "91e9bc2fd2d08736422cccee7e1506bda336e368f82dcb792c9d1bbf6348503c"
+  },
+  "id": "vN7ROVoA9Qu1nu0E",
+  "tags": []
+}

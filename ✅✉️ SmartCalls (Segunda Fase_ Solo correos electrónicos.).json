@@ -1,0 +1,576 @@
+{
+  "name": "✅✉️ SmartCalls (Segunda Fase: Solo correos electrónicos.)",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst dateStr = $('Bucle Correos').first().json.last_contact; // ejemplo: \"2025-05-07 12:49:18\"\n\n// Separar fecha y hora\nconst [fecha, hora] = dateStr.split(' ');\n\n// Extraer partes\nconst [anio, mes, dia] = fecha.split('-');\nconst horaFormateada = hora.slice(0, 5); // solo HH:MM\n\n// Meses en español\nconst meses = [\n  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',\n  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'\n];\n\nconst fechaFormateada = `${parseInt(dia, 10)} de ${meses[parseInt(mes, 10) - 1]} de ${anio}`;\n\n// Devolver todo lo original + los nuevos campos\nreturn [{\n  json: {\n    ...item,\n    fechaFormateada,\n    horaFormateada\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        320,
+        -144
+      ],
+      "id": "85bb5224-427f-4a73-84ba-3722fdcb6999",
+      "name": "Fortmatear Hora",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "### Extraer Contactos a los que se les ha llamado ya 1 vez.\n",
+        "height": 240,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -464,
+        -224
+      ],
+      "typeVersion": 1,
+      "id": "ce4f77cf-881a-4098-8745-79fc8289c0a3",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -688,
+        -144
+      ],
+      "id": "bb2e911b-d89d-4d24-8879-326bb897551d",
+      "name": "Iniciar"
+    },
+    {
+      "parameters": {
+        "content": "Se modifica el campo last_contact para mostrarlo en formato fecha y hora.",
+        "height": 220,
+        "width": 220,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        272,
+        -224
+      ],
+      "typeVersion": 1,
+      "id": "4d6b2349-364d-4777-b81b-049996ec1972",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "fromEmail": "no-reply@smartcalls.biz",
+        "toEmail": "={{ $json.email }}, info@smartcalls.biz, patrick.optimaquantum@gmail.com",
+        "subject": "={{ $('Bucle Correos').item.json.contact_name.split(' ').slice(0, 2).map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') }}, acabas de perder -1000€ por NO CONTESTAR!!\n",
+        "html": "=<html>\n<head>\n  <style>\n    body {\n      font-family: Arial, sans-serif;\n      color: #333;\n      line-height: 1.6;\n    }\n    .footer {\n      font-size: 12px;\n      color: #666;\n      margin-top: 40px;\n    }\n    .unsubscribe {\n      color: #ffffff;\n      text-decoration: none;\n    }\n    .container {\n      max-width: 600px;\n      margin: auto;\n    }\n    .cta {\n      background-color: #0066cc;\n      color: white;\n      padding: 10px 15px;\n      display: inline-block;\n      text-decoration: none;\n      border-radius: 5px;\n      margin-top: 20px;\n      align-items: center;\n    }\n    ul {\n      margin: 10px 0;\n      padding-left: 20px;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <p>\n      {{ $('MySQL Tabla Customer').item.json.contact_name.split(' ')[1].toLowerCase().replace(/^./, c => c.toUpperCase()) }} ...\n    </p>\n\n    <p>\nLa llamada más importante de 2025 te llego el <strong>{{ $('Fortmatear Hora').item.json.fechaFormateada }}</strong> a las <strong>{{ $('Fortmatear Hora').item.json.horaFormateada }}</strong>\n    </p>\n    <p> \nY como empresa sabes exactamente que cada llamada perdida es <strong>DINERO QUE HAS PERDIDO.</strong>\n    </p>\n    <p>\n    Y como promedio el <strong>80%</strong> de clientes potenciales <strong>NUNCA</strong> vuelven a llamar…\n    </p>\n    <p>\n<strong>SI NO LES CONTESTAS!</strong>\n    </p>\n<br>\n    <ul>\n      <li><strong>Oportunidad de ingresos perdidos</strong></li>\n      <li><strong>Reputación DAÑADA</strong></li>\n      <li><strong>Tiempo Malgastado en encontrar el porqué…</strong></li>\n    </ul>\n<br>\n\n    <p>\nEsta llamada te daba la solución para aprovechar <strong>CADA OPORTUNIDAD</strong> de hacer <strong>dinero YA</strong>:\n    </p><br>\n\n    <ul>\n      <li><strong>Sin que tengas que levantar un dedo</strong></li>\n      <li><strong>Los fines de semana</strong></li>\n      <li><strong>Cuando tu equipo no rinda</strong></li>\n    </ul><br>\n\n    <p>\nIA es el futuro, y si tú no APROVECHAS el <strong>ASISTENTE VIRTUAL con IA PIONERO</strong> que:\n    </p><br>\n\n    <ul>\n      <li><strong>Filtra Interesados reales</strong></li>\n      <li><strong>Agendar citas</strong></li>\n      <li><strong>Nunca dejar escapar una oportunidad</strong></li>\n    </ul>\n\n    <p><br>\n\n      <strong>\nSi quieres verlo en acción, y no solo leer este email sin tomar acciones ninguna…</strong>\n    </p>\n\n    <p\n      <a href=\"https://cal.com/smartcalls/reservar-meet-con-clientes?user=smartcalls\" class=\"cta\"><span style=\"color: white\">Agenda ahora una videollamada gratis</span></a>\n      </div>\n    </p>\n\n    <p>Saludos,<br/>\n    SmartCalls</p>\n\n    <p>\n      Escríbenos: <a href=\"mailto:info@smartcalls.biz\">info@smartcalls.biz</a><br/>\n      O llámanos:<br/>\n      España: +34 919 932 145<br/>\n      USA: +1 332 232 7483<br/>\n      Visita: <a href=\"https://smartcalls.biz\">https://smartcalls.biz</a>\n    </p>\n\n    <div class=\"footer\">\n      <img src=\"https://pixel.smartcalls.biz/track/{{ $('Bucle Correos').item.json.place_id }}\" width=\"1\" height=\"1\" style=\"display:none;\" alt=\"tracking pixel\"/><br/>\n      <a href=\"mailto:info@smartcalls.biz?subject=Darme de baja {{ $('MySQL Tabla Customer').item.json.contact_name }}\" class=\"unsubscribe\">Desuscribirse</a>\n    </div>\n  </div>\n</body>\n</html>\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        800,
+        -160
+      ],
+      "id": "20a186b3-4d99-4503-b72d-4be258305914",
+      "name": "Correo Segunda Pasada",
+      "webhookId": "e1dbea9c-06bd-4f05-9263-bd5d5df944e2",
+      "credentials": {
+        "smtp": {
+          "id": "Dx9eTPsVTPlyb1CQ",
+          "name": "SMTP SmartCalls"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "# Segunda Fase de Correos (APIS 5)  \n",
+        "height": 600,
+        "width": 1900,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -528,
+        -320
+      ],
+      "typeVersion": 1,
+      "id": "7a775f52-5635-4c32-8efb-eacf9d04f6cf",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * \nFROM customer \nWHERE ORIGIN_ID = 5 \n  AND call_attempts = 1 AND is_active = 1 AND email != \"no@email\";\n\n\n",
+        "options": {}
+      },
+      "id": "b7ed74fd-d1fc-400c-9e61-09d03d41c50a",
+      "name": "MySQL Tabla Customer",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        -400,
+        -144
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Función para formatear la fecha\nfunction formatDate(date) {\n    const year = date.getFullYear();\n    const month = String(date.getMonth() + 1).padStart(2, '0');\n    const day = String(date.getDate()).padStart(2, '0');\n    const hours = String(date.getHours()).padStart(2, '0');\n    const minutes = String(date.getMinutes()).padStart(2, '0');\n    const seconds = String(date.getSeconds()).padStart(2, '0');\n    \n    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;\n}\n\n// Obtener la fecha y hora actuales en la zona horaria de España\nconst currentDate = new Date().toLocaleString('en-US', { timeZone: 'Europe/Madrid' });\nconst formattedDate = formatDate(new Date(currentDate));\n\n// Retornar el resultado en el formato esperado por n8n\nreturn [{\n    json: {\n        datetime: formattedDate\n    }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1008,
+        -160
+      ],
+      "id": "c9f62758-4a6f-4f23-96e5-55434fe38a61",
+      "name": "DataTime",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "table": {
+          "__rl": true,
+          "value": "customer",
+          "mode": "list",
+          "cachedResultName": "customer"
+        },
+        "dataMode": "defineBelow",
+        "columnToMatchOn": "place_id",
+        "valueToMatchOn": "={{ $('Bucle Correos').item.json.place_id }}",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "last_contact",
+              "value": "={{ $('Bucle Correos').item.json.last_contact }}"
+            },
+            {
+              "column": "call_attempts",
+              "value": "2"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ca16b250-747d-4850-8a60-cde19848f2cf",
+      "name": "DB Customer (2ª Llamada Realizada)",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        1200,
+        -160
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "Guardamos **is_contacted = 2** ",
+        "height": 200,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        512,
+        -208
+      ],
+      "typeVersion": 1,
+      "id": "1653a6e2-6ecf-4d9b-890e-40eba04f8cd5",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1200,
+        80
+      ],
+      "id": "9217c318-332c-4a26-972d-d72a5146b2f4",
+      "name": "1 Segundo",
+      "webhookId": "ee71b996-124d-4aa3-ab11-e90e614aa61f"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -160,
+        -144
+      ],
+      "id": "837ce926-ff74-4b01-beac-c0891bad33b4",
+      "name": "Bucle Correos"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "25b121f8-fb8d-4383-b3d6-783539c3a701",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "=no@email",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "6197c339-f70d-4e09-a3c0-81f133dcf3fb",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        64,
+        -128
+      ],
+      "id": "7ec93d63-6d6d-4aa5-8a5c-a41cfda98aff",
+      "name": "Verificar Email"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "table": {
+          "__rl": true,
+          "value": "customer",
+          "mode": "list",
+          "cachedResultName": "customer"
+        },
+        "dataMode": "defineBelow",
+        "columnToMatchOn": "place_id",
+        "valueToMatchOn": "={{ $('Bucle Correos').item.json.place_id }}",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "email",
+              "value": "=no@email"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a49b847e-1788-4e68-a844-411f61e861c7",
+      "name": "DB Customer (Sin Email)",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        560,
+        48
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5e9b7a4c-3c2f-4442-8f1a-0bc83fc6825b",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        320,
+        32
+      ],
+      "id": "5209cc96-fd4a-4a60-accb-0c918b6cc7ed",
+      "name": "Verificar no@email"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c9b55891-d575-4011-8ab1-07b21e09943d",
+              "leftValue": "={{ $json.contact_name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        -144
+      ],
+      "id": "9a38b5f9-85a0-4048-81c8-d3babd03e0e6",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * \nFROM customer \nWHERE ORIGIN_ID = 5 AND email = \"no@email\";\n\n\n",
+        "options": {}
+      },
+      "id": "481cb19d-d12d-44c2-8e29-4a83833327be",
+      "name": "Personas Sin Email",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        64,
+        368
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM * LIMIT 10;\n",
+        "options": {}
+      },
+      "id": "8c5a3b66-fad2-4b7b-b6d3-58cfe630cad3",
+      "name": "MySQL Tabla Customer1",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        -304,
+        368
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Fortmatear Hora": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Iniciar": {
+      "main": [
+        [
+          {
+            "node": "MySQL Tabla Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Correo Segunda Pasada": {
+      "main": [
+        [
+          {
+            "node": "DataTime",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL Tabla Customer": {
+      "main": [
+        [
+          {
+            "node": "Bucle Correos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DataTime": {
+      "main": [
+        [
+          {
+            "node": "DB Customer (2ª Llamada Realizada)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB Customer (2ª Llamada Realizada)": {
+      "main": [
+        [
+          {
+            "node": "1 Segundo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1 Segundo": {
+      "main": [
+        [
+          {
+            "node": "Bucle Correos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bucle Correos": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Verificar Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar Email": {
+      "main": [
+        [
+          {
+            "node": "Fortmatear Hora",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Verificar no@email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB Customer (Sin Email)": {
+      "main": [
+        [
+          {
+            "node": "Bucle Correos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar no@email": {
+      "main": [
+        [
+          {
+            "node": "Bucle Correos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DB Customer (Sin Email)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Correo Segunda Pasada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0c6b843f-c78f-4cee-a47c-0cac7d3ce0da",
+  "meta": {
+    "instanceId": "91e9bc2fd2d08736422cccee7e1506bda336e368f82dcb792c9d1bbf6348503c"
+  },
+  "id": "C3XAyqX03J1i9gy8",
+  "tags": []
+}

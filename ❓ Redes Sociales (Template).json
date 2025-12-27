@@ -1,0 +1,978 @@
+{
+  "name": "❓ Redes Sociales (Template)",
+  "nodes": [
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"twitter\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"facebook\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n        \"linkedin\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n        \"instagram\": {\n\t\t\t\"type\": \"string\"\n\t\t}\n\t}\n}"
+      },
+      "id": "a21de65d-659d-4c53-b413-f40311d7776a",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        -448,
+        704
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "={{ $json.output.instagram }}",
+        "options": {
+          "size": "1024x1024",
+          "returnImageUrls": true
+        }
+      },
+      "id": "65599c4f-657b-4ee2-b6d0-539bf2036d94",
+      "name": "Image Instagram",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        -64,
+        832
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v22.0",
+        "node": "612494751955433",
+        "edge": "feed",
+        "sendBinaryData": true,
+        "binaryPropertyName": "data",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "message",
+                "value": "={{ $('Generador de Contenido').item.json.output.facebook }}"
+              },
+              {
+                "name": "link",
+                "value": "={{ $('Descargar Artículo WordPress').item.json.link }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "80d998d3-af15-4d4c-a052-73660d1ec050",
+      "name": "Publish on Facebook",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "position": [
+        304,
+        832
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "qVNnjHhKFjQp0sbF",
+          "name": "Facebook Graph account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -640,
+        704
+      ],
+      "id": "8e9012c4-459a-466d-ab9d-f20280f3d62f",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "postId": "=1581",
+        "options": {}
+      },
+      "id": "98775749-7104-44ee-a7d0-b54b7e213b78",
+      "name": "Descargar Artículo WordPress",
+      "type": "n8n-nodes-base.wordpress",
+      "position": [
+        -816,
+        864
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "wordpressApi": {
+          "id": "teUGGLMVTYrw7lVa",
+          "name": "Wordpress Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate social content from the following text with title \"{{ $json.title.rendered }}\" (in the same language):\n\n'''\n{{ $json.content.rendered }}\n'''",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "==Generate social content from the following text with title \"{{ $json.title.rendered }}\" (in the same language):\n\n'''\n{{ $json.content.rendered }}\n'''"
+            }
+          ]
+        }
+      },
+      "id": "69fcb732-9758-4d1d-9c92-b21cd6e19d72",
+      "name": "Generador de Contenido",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        -640,
+        864
+      ],
+      "typeVersion": 1.5,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        128,
+        832
+      ],
+      "id": "a0bc10c0-81be-4f82-9fc5-a3e3b7645fc6",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "56d49e4d-d589-4dcd-aa5d-fd9654d81f64",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -304,
+        848
+      ],
+      "id": "2b154290-96e8-494b-9834-b31055e7a681",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v20.0/433770813646235/media",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "facebookGraphApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "image_url",
+              "value": "={{ $('Image Instagram').item.json.url }}"
+            },
+            {
+              "name": "caption",
+              "value": "={{ $json.Instagram }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "883946e9-682d-4def-b99a-33536c0296b8",
+      "name": "Publish on Instagram",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        720,
+        832
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "qVNnjHhKFjQp0sbF",
+          "name": "Facebook Graph account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "={{ $('If').item.json.output.linkedin }}",
+        "options": {
+          "size": "1792x1024",
+          "returnImageUrls": false
+        }
+      },
+      "id": "01c70a9e-dfb6-412e-b7aa-3b0b6486b234",
+      "name": "Image Linkedin",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        960,
+        832
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "person": "FYEKbbaqnr",
+        "text": "={{ $('Facebook').item.json.Linkedin }}",
+        "shareMediaCategory": "IMAGE",
+        "additionalFields": {}
+      },
+      "id": "ded40967-8840-46cc-a70c-45ace13d17b6",
+      "name": "Publish on LinkedIn1",
+      "type": "n8n-nodes-base.linkedIn",
+      "position": [
+        1200,
+        832
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "W7ANaf0syZbnP0ex",
+          "name": "LinkedIn Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg",
+          "mode": "list",
+          "cachedResultName": "Artículos Wordpress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1016010412,
+          "mode": "list",
+          "cachedResultName": "Publicaciones Redes Sociales",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117qFlyq4j8Drg94-X3y45CNQjs371J0rG2hInnh_cGg/edit#gid=1016010412"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Post ID": "={{ $('Descargar Artículo WordPress').item.json.id }}",
+            "Title": "={{ $('Descargar Artículo WordPress').item.json.title.rendered }}",
+            "Facebook": "={{ $('If').item.json.output.facebook }}",
+            "Instagram": "={{ $('If').item.json.output.instagram }}",
+            "Linkedin": "={{ $('If').item.json.output.linkedin }}",
+            "Twitter": "={{ $('If').item.json.output.twitter }}"
+          },
+          "matchingColumns": [
+            "Post ID"
+          ],
+          "schema": [
+            {
+              "id": "Post ID",
+              "displayName": "Post ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Twitter",
+              "displayName": "Twitter",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Facebook",
+              "displayName": "Facebook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Instagram",
+              "displayName": "Instagram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Linkedin",
+              "displayName": "Linkedin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "e49365c8-ce2e-48a7-890e-42855213968e",
+      "name": "Facebook",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        512,
+        832
+      ],
+      "typeVersion": 4.5,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "004e4eff-2874-49af-92ab-259edf6627cf",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        32,
+        480
+      ],
+      "id": "a55f234a-f16e-4acb-8001-f8a6539b3083",
+      "name": "Webhook",
+      "webhookId": "004e4eff-2874-49af-92ab-259edf6627cf"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.query['hub.challenge'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        352,
+        512
+      ],
+      "id": "d2cf166f-ba74-4f06-b428-b66e3586f1bd",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.instagram.com/oauth/access_token",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "AQCb443FFzkEP3fX-2iFjW8oGdxbdA-baW8fEbWtkiWHcw5aLNkEyTABokbxgszrlY6XhUcn-G848ED6OFn1RfXS7wYneVo7ct9WGdBhenAwb2vkvF5mqTeiXTlL8p_Zntv_qW6-AWJplDYBgyITMYvlsJIVOk-TOB-ZLE1mCV9_UPBZHOp_C1Jd0JJnU8uxr3YmcrDwlFuI_dlx0fNJ04afUdStVuw8et-6zsdQS8intw-4aq-qLnqb_qq2J5Mnj2qu8G6cVAuBdf3t08WbzaIHArRTQ"
+            },
+            {
+              "name": "redirect_uri",
+              "value": "https://optimaquantum.com/webtest/"
+            },
+            {
+              "name": "client_id",
+              "value": "3923152657926585"
+            },
+            {
+              "name": "client_secret",
+              "value": "ad7f0635a7ba6d3a66b8533df4d717ae"
+            },
+            {
+              "name": "grant_type",
+              "value": "authorization_code"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        544,
+        112
+      ],
+      "id": "b51ce248-b770-4f81-b41f-54624e0909f8",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "url": "https://graph.instagram.com/access_token",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "acces_token",
+              "value": "IGAA3wFiiTSblBZAE4wdENnd1MyaXhmSWR1ZAUNFNlFpWkhVNVdqWXFVM2ZAXdnNBcnZARck5XUFJiMTBFR0h4RExLOUtjdjBjS2ZA1ZAmVDX0I0RWRhLWxBcjBuRVJ2V1BsbUMtcWZAVNWlCV21TRDBmVFBzMmV4ZA01zY3VPSE55anNSb2t1T3VmdmpTMi1R"
+            },
+            {
+              "name": "client_secret",
+              "value": "ad7f0635a7ba6d3a66b8533df4d717ae"
+            },
+            {
+              "name": "grant_type",
+              "value": "ig_exchange_token"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        544,
+        304
+      ],
+      "id": "6a8edbf0-4f41-41f2-83bc-f77669d356be",
+      "name": "HTTP Request2",
+      "credentials": {
+        "oAuth2Api": {
+          "id": "pIEyq5wo4DP9GPSt",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1088,
+        1344
+      ],
+      "id": "d2fccdbf-9e07-4f8c-a41c-294becf2477e",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"twitter\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"facebook\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n        \"linkedin\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n        \"instagram\": {\n\t\t\t\"type\": \"string\"\n\t\t}\n\t}\n}"
+      },
+      "id": "c0a323a8-d006-4003-8947-91274531804a",
+      "name": "Structured Output Parser1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        -448,
+        1184
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "={{ $json.output.instagram }}",
+        "options": {
+          "size": "1024x1024",
+          "returnImageUrls": true
+        }
+      },
+      "id": "7623c140-531b-475c-9d8d-0c6775f497e0",
+      "name": "Image Instagram1",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        -64,
+        1312
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -640,
+        1184
+      ],
+      "id": "557e26ad-7506-4173-b0c3-2280dbe7af3d",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "postId": "=1581",
+        "options": {}
+      },
+      "id": "642a5058-230e-4ac3-b10e-730295e5d8e7",
+      "name": "Descargar Artículo WordPress1",
+      "type": "n8n-nodes-base.wordpress",
+      "position": [
+        -880,
+        1344
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "wordpressApi": {
+          "id": "teUGGLMVTYrw7lVa",
+          "name": "Wordpress Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate social content from the following text with title \"{{ $json.title.rendered }}\" (in the same language):\n\n'''\n{{ $json.content.rendered }}\n'''",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "==Generate social content from the following text with title \"{{ $json.title.rendered }}\" (in the same language):\n\n'''\n{{ $json.content.rendered }}\n'''"
+            }
+          ]
+        }
+      },
+      "id": "879f01c2-2683-4eb9-a847-23a133f2f2bb",
+      "name": "Generador de Contenido1",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        -640,
+        1344
+      ],
+      "typeVersion": 1.5,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        160,
+        1312
+      ],
+      "id": "aae7d7ae-457b-4552-b02b-a97c19c14043",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "56d49e4d-d589-4dcd-aa5d-fd9654d81f64",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -304,
+        1328
+      ],
+      "id": "4c767c56-639e-474b-a728-bf54af856c6d",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v20.0/433770813646235/media",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "facebookGraphApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "image_url",
+              "value": "={{ $('Image Instagram1').item.json.url }}"
+            },
+            {
+              "name": "caption",
+              "value": "={{ $('If1').item.json.output.instagram }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "44622b89-0a55-4269-b494-16b0a13561b0",
+      "name": "Publish on Instagram1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        384,
+        1312
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "qVNnjHhKFjQp0sbF",
+          "name": "Facebook Graph account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Generador de Contenido",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Instagram": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish on Facebook": {
+      "main": [
+        [
+          {
+            "node": "Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generador de Contenido",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Descargar Artículo WordPress": {
+      "main": [
+        [
+          {
+            "node": "Generador de Contenido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generador de Contenido": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generador de Contenido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Publish on Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Image Instagram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish on Instagram": {
+      "main": [
+        [
+          {
+            "node": "Image Linkedin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Linkedin": {
+      "main": [
+        [
+          {
+            "node": "Publish on LinkedIn1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facebook": {
+      "main": [
+        [
+          {
+            "node": "Publish on Instagram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish on LinkedIn1": {
+      "main": [
+        []
+      ]
+    },
+    "Webhook": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        []
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        []
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Descargar Artículo WordPress1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Generador de Contenido1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Instagram1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generador de Contenido1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Descargar Artículo WordPress1": {
+      "main": [
+        [
+          {
+            "node": "Generador de Contenido1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generador de Contenido1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generador de Contenido1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Publish on Instagram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Image Instagram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish on Instagram1": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b0780237-7e19-456e-b7e2-c09eaaa7d988",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "91e9bc2fd2d08736422cccee7e1506bda336e368f82dcb792c9d1bbf6348503c"
+  },
+  "id": "7ov74LmuXefXlp6w",
+  "tags": []
+}

@@ -1,0 +1,239 @@
+{
+  "name": "✉ Correo Electrónico Individual",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        -256
+      ],
+      "id": "df2276f9-f5c3-4549-8fd6-90e0dcc8fef1",
+      "name": "Iniciar"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        192,
+        -256
+      ],
+      "id": "15226b35-1111-4e90-885e-4c770a87a46a",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst dateStr = item.last_contact; // ejemplo: \"2025-05-07 12:49:18\"\n\n// Separar fecha y hora\nconst [fecha, hora] = dateStr.split(' ');\n\n// Extraer partes\nconst [anio, mes, dia] = fecha.split('-');\nconst horaFormateada = hora.slice(0, 5); // solo HH:MM\n\n// Meses en español\nconst meses = [\n  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',\n  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'\n];\n\nconst fechaFormateada = `${parseInt(dia, 10)} de ${meses[parseInt(mes, 10) - 1]} de ${anio}`;\n\n// Devolver todo lo original + los nuevos campos\nreturn [{\n  json: {\n    ...item,\n    fechaFormateada,\n    horaFormateada\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        -240
+      ],
+      "id": "6ac7b2ad-d655-4298-bbe1-34b3ab59402c",
+      "name": "Fortmatear Hora1"
+    },
+    {
+      "parameters": {
+        "amount": 0.5
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        608,
+        -240
+      ],
+      "id": "b019fdc7-bd40-425b-92d2-87fb39f439b1",
+      "name": "Wait",
+      "webhookId": "2a09fc8d-cb0e-4f45-a796-132eb33f7ad5"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM customer\nWHERE ORIGIN_ID = 5 LIMIT 1;",
+        "options": {}
+      },
+      "id": "eb01fa06-7c69-453f-a1af-19542585aa3a",
+      "name": "MySQL Tabla Customer1",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        -48,
+        -256
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "fromEmail": "no-reply@smartcalls.biz",
+        "toEmail": "={{ $('Loop Over Items').item.json.email }}, info@smartcalls.biz",
+        "subject": "={{ $('Loop Over Items').item.json.contact_name.split(' ').slice(0, 2).map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') }}, una simple llamada puede cambiar tu mes (o perderlo)",
+        "emailFormat": "both",
+        "text": "=Hola {{ $('Loop Over Items').item.json.contact_name.split(' ')[0].toLowerCase().replace(/^./, c => c.toUpperCase()) }},\n\nIntentamos llamarte el {{ $('Fortmatear Hora1').item.json.fechaFormateada }} a las {{ $('Fortmatear Hora1').item.json.horaFormateada }}, pero no pudimos hablar contigo. ¿Te ha pasado antes?\n\nCada llamada perdida puede ser una venta menos.\nEl 80% de los clientes no vuelve a llamar si no obtienen respuesta.\nEso significa:\n\t•\tIngresos perdidos\n\t•\tMala reputación\n\t•\tTiempo malgastado\n\n¿La solución? Nuestro asistente virtual con IA responde y emite llamadas 24/7, filtra interesados reales, agenda citas y nunca deja escapar una oportunidad.\n\n¿Quieres verlo en acción?\nAgenda ahora una videollamada gratis:\nhttps://cal.com/smartcalls/reservar-meet-con-clientes?user=smartcalls\n\nSaludos!\n\nEl equipo de SmartCalls\n\nEscríbenos: info@smartcalls.biz\nO Llámanos :\nEspaña: +34 919 932 145\nUSA +1 332 232 7483\nVisita: https://smartcalls.biz\n\n\n\nPara desuscribirse envianos un email a info@smartcalls.biz\n",
+        "html": "=<html>\n<head>\n  <style>\n    body {\n      font-family: Arial, sans-serif;\n      color: #333;\n      line-height: 1.6;\n    }\n    .footer {\n      font-size: 12px;\n      color: #666;\n      margin-top: 40px;\n    }\n    .unsubscribe {\n      color: #ffffff;\n      text-decoration: none;\n    }\n    .container {\n      max-width: 600px;\n      margin: auto;\n    }\n    .cta {\n      background-color: #0066cc;\n      color: white;\n      padding: 10px 15px;\n      display: inline-block;\n      text-decoration: none;\n      border-radius: 5px;\n      margin-top: 20px;\n    }\n    ul {\n      margin: 10px 0;\n      padding-left: 20px;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <p>\n      Hola {{ $('Loop Over Items').item.json.contact_name.split(' ')[0].toLowerCase().replace(/^./, c => c.toUpperCase()) }},\n    </p>\n\n    <p>\n      Intentamos llamarte el <strong>{{ $('Fortmatear Hora1').item.json.fechaFormateada }} a las {{ $('Fortmatear Hora1').item.json.horaFormateada }}</strong>, pero no pudimos hablar contigo. ¿Te ha pasado antes?\n    </p>\n\n    <p> \n      <strong>Cada llamada perdida puede ser una venta menos.</strong>\n    </p>\n    <p>\n      El 80% de los clientes no vuelve a llamar si no obtienen respuesta. Eso significa:\n    </p>\n    <ul>\n      <li>Ingresos perdidos</li>\n      <li>Mala reputación</li>\n      <li>Tiempo malgastado</li>\n    </ul>\n\n    <p>\n      <strong>¿La solución?</strong> Nuestro <strong>asistente virtual con IA</strong> responde y emite llamadas 24/7, filtra interesados reales, agenda citas y nunca deja escapar una oportunidad.\n    </p>\n\n    <p>\n      <strong>¿Quieres verlo en acción?</strong><br/>\n      <div style=\"text-align: center;\">\n      <a href=\"https://cal.com/smartcalls/reservar-meet-con-clientes?user=smartcalls\" class=\"cta\"><span style=\"color: white\">Agenda ahora una videollamada gratis</span></a>\n      </div>\n    </p>\n\n    <p>Saludos,<br/>\n    El equipo de SmartCalls</p>\n\n    <p>\n      Escríbenos: <a href=\"mailto:info@smartcalls.biz\">info@smartcalls.biz</a><br/>\n      O llámanos:<br/>\n      España: +34 919 932 145<br/>\n      USA: +1 332 232 7483<br/>\n      Visita: <a href=\"https://smartcalls.biz\">https://smartcalls.biz</a>\n    </p>\n\n    <div class=\"footer\">\n      <img src=\"https://pixel.smartcalls.biz/track/{{ $json.place_id }}\" width=\"1\" height=\"1\" style=\"display:none;\" alt=\"tracking pixel\"/><br/>\n      <a href=\"https://n8n.optimaquantum.com/webhook-test/desuscribir?place_id={{ $('Loop Over Items').item.json.place_id }}\" class=\"unsubscribe\">Desuscribirse</a>\n    </div>\n  </div>\n</body>\n</html>\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        784,
+        -240
+      ],
+      "id": "1485922e-f007-4175-9d10-728183a6e148",
+      "name": "Enviar Correo",
+      "webhookId": "e1dbea9c-06bd-4f05-9263-bd5d5df944e2",
+      "credentials": {
+        "smtp": {
+          "id": "Dx9eTPsVTPlyb1CQ",
+          "name": "SMTP SmartCalls"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM customer\nWHERE ORIGIN_ID = 5 AND is_contacted = 1;",
+        "options": {}
+      },
+      "id": "cd8183aa-3ab4-4c53-a30f-cbb46e3735e9",
+      "name": "MySQL Tabla Customer",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        48,
+        0
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "fromEmail": "no-reply@smartcalls.biz",
+        "toEmail": "=info@smartcalls.biz",
+        "subject": "={{ $('MySQL Tabla Customer').item.json.contact_name.split(' ').slice(0, 2).map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') }}, una simple llamada puede cambiar tu mes (o perderlo)",
+        "emailFormat": "both",
+        "text": "=Hola {{ $('MySQL Tabla Customer').item.json.contact_name.split(' ')[1].toLowerCase().replace(/^./, c => c.toUpperCase()) }},\n\nIntentamos llamarte el {{ $json.fechaFormateada }} a las {{ $json.horaFormateada }}, pero no pudimos hablar contigo. ¿Te ha pasado antes?\n\nCada llamada perdida puede ser una venta menos.\nEl 80% de los clientes no vuelve a llamar si no obtienen respuesta.\nEso significa:\n\t•\tIngresos perdidos\n\t•\tMala reputación\n\t•\tTiempo malgastado\n\n¿La solución? Nuestro asistente virtual con IA responde y emite llamadas 24/7, filtra interesados reales, agenda citas y nunca deja escapar una oportunidad.\n\n¿Quieres verlo en acción?\nAgenda ahora una videollamada gratis:\nhttps://cal.com/smartcalls/reservar-meet-con-clientes?user=smartcalls\n\nSaludos!\n\nEl equipo de SmartCalls\n\nEscríbenos: info@smartcalls.biz\nO Llámanos :\nEspaña: +34 919 932 145\nUSA +1 332 232 7483\nvisita: https://smartcalls.biz\n\n\n\nPara desuscribirse envianos un email a info@smartcalls.biz\n",
+        "html": "=<html>\n<head>\n  <style>\n    body {\n      font-family: Arial, sans-serif;\n      color: #333;\n      line-height: 1.6;\n    }\n    .footer {\n      font-size: 12px;\n      color: #666;\n      margin-top: 40px;\n    }\n    .unsubscribe {\n      color: #ffffff;\n      text-decoration: none;\n    }\n    .container {\n      max-width: 600px;\n      margin: auto;\n    }\n    .cta {\n      background-color: #0066cc;\n      color: white;\n      padding: 10px 15px;\n      display: inline-block;\n      text-decoration: none;\n      border-radius: 5px;\n      margin-top: 20px;\n    }\n    ul {\n      margin: 10px 0;\n      padding-left: 20px;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <p>\n      Hola {{ $('MySQL Tabla Customer').item.json.contact_name.split(' ')[1].toLowerCase().replace(/^./, c => c.toUpperCase()) }},\n    </p>\n\n    <p>\n      Intentamos llamarte el <strong>{{ $('Fortmatear Hora').item.json.fechaFormateada }} a las {{ $('Fortmatear Hora').item.json.horaFormateada }}</strong>, pero no pudimos hablar contigo. ¿Te ha pasado antes?\n    </p>\n\n    <p> \n      <strong>Cada llamada perdida puede ser una venta menos.</strong>\n    </p>\n    <p>\n      El 80% de los clientes no vuelve a llamar si no obtienen respuesta. Eso significa:\n    </p>\n    <ul>\n      <li>Ingresos perdidos</li>\n      <li>Mala reputación</li>\n      <li>Tiempo malgastado</li>\n    </ul>\n\n    <p>\n      <strong>¿La solución?</strong> Nuestro <strong>asistente virtual con IA</strong> responde y emite llamadas 24/7, filtra interesados reales, agenda citas y nunca deja escapar una oportunidad.\n    </p>\n\n    <p>\n      <strong>¿Quieres verlo en acción?</strong><br/>\n      <div style=\"text-align: center;\">\n      <a href=\"https://cal.com/smartcalls/reservar-meet-con-clientes?user=smartcalls\" class=\"cta\"><span style=\"color: white\">Agenda ahora una videollamada gratis</span></a>\n      </div>\n    </p>\n\n    <p>Saludos,<br/>\n    El equipo de SmartCalls</p>\n\n    <p>\n      Escríbenos: <a href=\"mailto:info@smartcalls.biz\">info@smartcalls.biz</a><br/>\n      O llámanos:<br/>\n      España: +34 919 932 145<br/>\n      USA: +1 332 232 7483<br/>\n      Visita: <a href=\"https://smartcalls.biz\">https://smartcalls.biz</a>\n    </p>\n\n    <div class=\"footer\">\n      <img src=\"https://pixel.smartcalls.biz/track/{{ $('Bucle Llamadas').item.json.place_id }}\" width=\"1\" height=\"1\" style=\"display:none;\" alt=\"tracking pixel\"/><br/>\n      <a href=\"mailto:info@smartcalls.biz?subject=Darme de baja {{ $('MySQL Tabla Customer').item.json.contact_name }}\" class=\"unsubscribe\">Desuscribirse</a>\n    </div>\n  </div>\n</body>\n</html>\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        320,
+        0
+      ],
+      "id": "da9f56ac-0fb7-4d10-b482-bb844685d961",
+      "name": "Sin Contacto Email Resguardo1",
+      "webhookId": "e1dbea9c-06bd-4f05-9263-bd5d5df944e2",
+      "credentials": {
+        "smtp": {
+          "id": "Dx9eTPsVTPlyb1CQ",
+          "name": "SMTP SmartCalls"
+        }
+      },
+      "disabled": true,
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Iniciar": {
+      "main": [
+        [
+          {
+            "node": "MySQL Tabla Customer1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Fortmatear Hora1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fortmatear Hora1": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Enviar Correo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL Tabla Customer1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Correo": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e03e1c8c-6a3d-425f-ae8c-cf8d9608fec4",
+  "meta": {
+    "instanceId": "91e9bc2fd2d08736422cccee7e1506bda336e368f82dcb792c9d1bbf6348503c"
+  },
+  "id": "zGDRVowpCs7mOgVz",
+  "tags": []
+}

@@ -1,0 +1,179 @@
+{
+  "name": "Publicar en X",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate social content from the following text with title \"{{ $json.title.rendered }}\" (in the same language):\n\n'''\n{{ $json.content.rendered }}\n'''",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Generate social content from the following text with title \"{{ $json.title.rendered }}\" (in the same language):\n\n'''\n{{ $json.content.rendered }}\n'''"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -176,
+        -64
+      ],
+      "id": "df2bf817-0d20-4e0a-bfc5-c5c1abfa0651",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -304,
+        144
+      ],
+      "id": "b02d2cf4-1d34-4978-83d4-8afc07e6c5fd",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -128,
+        144
+      ],
+      "id": "f0dd3533-aa10-4d6a-a954-24ead2b0f8a1",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.twitterTool",
+      "typeVersion": 2,
+      "position": [
+        64,
+        128
+      ],
+      "id": "6400e437-00bd-4f87-9230-d2dd72e013af",
+      "name": "X",
+      "credentials": {
+        "twitterOAuth2Api": {
+          "id": "eAlXQdutWkGS56iL",
+          "name": "X OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "3002ff8d-0c7c-43b7-bd09-480c13d47b38",
+      "name": "Iniciar",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -560,
+        -64
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "postId": "=1581",
+        "options": {}
+      },
+      "id": "5e4636bc-ea03-409d-9417-ae7192ceb848",
+      "name": "Descargar Artículo WordPress",
+      "type": "n8n-nodes-base.wordpress",
+      "position": [
+        -400,
+        -64
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "wordpressApi": {
+          "id": "teUGGLMVTYrw7lVa",
+          "name": "Wordpress Optima Quantum"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "X": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Iniciar": {
+      "main": [
+        [
+          {
+            "node": "Descargar Artículo WordPress",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Descargar Artículo WordPress": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c2b595f7-47cb-467d-a43c-86c2efd733e4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "91e9bc2fd2d08736422cccee7e1506bda336e368f82dcb792c9d1bbf6348503c"
+  },
+  "id": "lHYsfFPm3sJDKajB",
+  "tags": []
+}

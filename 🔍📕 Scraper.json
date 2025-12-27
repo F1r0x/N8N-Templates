@@ -1,0 +1,1708 @@
+{
+  "name": "🔍📕 Scraper",
+  "nodes": [
+    {
+      "parameters": {
+        "batchSize": 5,
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -816,
+        752
+      ],
+      "id": "e742b380-b5b1-4297-91f1-31f37f03b1c4",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "id": "54f4d9dd-5f48-4478-bd3b-14b70d49b74d",
+      "name": "Inicio",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -1616,
+        752
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.URL }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "42df3417-6bc6-40ef-bf32-61e6eee656d8",
+      "name": "Request web page for URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -160,
+        992
+      ],
+      "typeVersion": 4.2,
+      "alwaysOutputData": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const data = $json.data || '';\nconst emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.(?!png|jpg|gif|jpeg)[a-zA-Z]{2,}/g;\nconst linkRegex = /href=[\"'](.*?)[\"']/g;\n\nconst emails = data.match(emailRegex) || [];\n\nlet links = [];\nif ($json.URL) {\n  try {\n    const baseUrl = new URL($json.URL).origin;\n    let match;\n    while ((match = linkRegex.exec(data)) !== null) {\n      let url = match[1];\n      if (url.startsWith('/')) {\n        url = baseUrl + url;\n      }\n      if (url.match(/contact|about|team|support/i)) {\n        links.push(url);\n      }\n    }\n  } catch (e) {\n    links = [];\n  }\n}\n\nreturn { json: { emails: emails, potentialLinks: links } };"
+      },
+      "id": "4a9bfc6b-1239-4b71-995d-ea0680c5fe99",
+      "name": "Scrape emails from page",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        64,
+        752
+      ],
+      "typeVersion": 2,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "# Extraer Información",
+        "height": 560,
+        "width": 680,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1280,
+        672
+      ],
+      "typeVersion": 1,
+      "id": "7c7e357a-f126-4ea8-90db-8eedb54f6f29",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Promp",
+        "height": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1680,
+        672
+      ],
+      "typeVersion": 1,
+      "id": "66105707-a489-41a1-b74e-37ac9aba6531",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const emailsArray = $json.emails || []; // Asegura que sea un array\nconst uniqueEmails = [...new Set(emailsArray)]; // Elimina duplicados\nreturn { json: { ID: $json.ID, emails: uniqueEmails } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        752
+      ],
+      "id": "d57669f7-2107-400a-9769-82d924857d93",
+      "name": "Eliminar Emails Repetidos"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "emails"
+            }
+          ]
+        },
+        "options": {
+          "mergeLists": true
+        }
+      },
+      "id": "aab01ee2-2850-4f82-9683-59b1d706c527",
+      "name": "Guardar Emails como Array",
+      "type": "n8n-nodes-base.aggregate",
+      "position": [
+        480,
+        752
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "facf280e-e8ff-4a9a-8437-b460e2d71a7c",
+              "name": "Place_ID",
+              "value": "={{ $('Bucle Descargar Página').item.json.Place_ID }}",
+              "type": "string"
+            },
+            {
+              "id": "111647b0-b679-401a-a70c-2c4b5f20a3f6",
+              "name": "emails",
+              "value": "={{ $json.emails }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        752
+      ],
+      "id": "2b084c38-2518-4032-bde9-720851d52aa5",
+      "name": "Email Preserve ID"
+    },
+    {
+      "parameters": {
+        "batchSize": 5,
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "46f4d79f-fa94-4841-b3c6-931ceb78e356",
+      "name": "Bucle Descargar Página",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        -368,
+        720
+      ],
+      "typeVersion": 3,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -144,
+        720
+      ],
+      "id": "4687ea93-58ab-4bee-a687-dd209caf69c1",
+      "name": "Bucle Extraer Emails",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "let emailsString = $json.emails || ''; // Obtiene la cadena o usa vacío si no hay nada\n\n// Si hay datos, convierte la cadena serializada en array y luego en cadena simple\nlet emailsResult = '';\nif (emailsString) {\n  try {\n    const emailsArray = JSON.parse(emailsString); // Parsea la cadena JSON a array\n    emailsResult = emailsArray.join(', '); // Une los elementos con coma y espacio\n  } catch (e) {\n    emailsResult = emailsString; // Si falla el parseo, usa la cadena original como fallback\n  }\n}\n\n// Devuelve el resultado con el ID\nreturn { json: { Place_ID: $json.Place_ID, emails: emailsResult } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        848,
+        752
+      ],
+      "id": "9b571bf9-c539-48c2-9ad9-426f05d46a66",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1248,
+        752
+      ],
+      "id": "c80ed295-94e5-403e-9ded-bade6233a423",
+      "name": "Wait1",
+      "webhookId": "38bac717-4d73-4974-bc32-e2b160ff6be9"
+    },
+    {
+      "parameters": {
+        "content": "# Primer Fase (SerpAPI Google)\n",
+        "height": 700,
+        "width": 2700
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1296,
+        560
+      ],
+      "typeVersion": 1,
+      "id": "6d254718-848f-4887-9bb7-dcdb5f19a6d5",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "url": "=https://serpapi.com/search?engine=google_local&q={{ $json.query }}&start={{ $json.start }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "serpApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1248,
+        752
+      ],
+      "id": "7f4a8862-aade-4008-8236-7e5ae77dbb51",
+      "name": "SerpAPI Google",
+      "credentials": {
+        "serpApi": {
+          "id": "x87Jb44THl5aN74Z",
+          "name": "SerpAPI Optima Quantum"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "local_results",
+        "include": "=[Object: {\"places\": [{\"position\": 1, \"rating\": 5, \"reviews\": 68, \"reviews_original\": \"(68)\", \"lsig\": \"AB86z5XuLLakV0JyDb4WyNY8-h5H\", \"links\": {\"directions\": \"https://www.google.com/maps/dir//Dentistas+Alicante+Dr+Rafael+Poveda+LLopis,+Pla%C3%A7a+d'Espanya,+1,+1%C2%BA+Dcha,+03004+Alicante,+Spain/data=!4m6!4m5!1m1!4e2!1m2!1m1!1s0xd6237ac5d998c03:0x1a1398dc3b23930c?sa=X&ved=2ahUKEwiBz7ri_KmMAxXTvokEHW20AFIQ48ADegQILxAA\"}, \"place_id\": \"1879013541196043020\", \"place_id_search\": \"https://serpapi.com/search.json?device=desktop&engine=google&google_domain=google.com&ludocid=1879013541196043020&q=dentistas+en+alicante\", \"gps_coordinates\": {\"latitude\": 38.35109, \"longitude\": -0.4850856}, \"title\": \"Dentistas Alicante Dr Rafael Poveda LLopis\", \"type\": \"Dentist\", \"phone\": \"+34 965 21 59 12\", \"address\": \"Plaça d'Espanya, 1, 1º Dcha\", \"hours\": \"Open ⋅ Closes 1 PM\"},{\"position\": 2, \"rating\": 4.7, \"reviews\": 380, \"reviews_original\": \"(380)\", \"lsig\": \"AB86z5VWIGSf89KOOhb_Iq1-BUlO\", \"service_options\": {\"onsite_services\": true}, \"links\": {\"website\": \"http://clinicakranion.com/\", \"directions\": \"https://www.google.com/maps/dir//Cl%C3%ADnica+Kranion,+Calle+Callosa+de+Segura,+1,+03005+Alicante,+Spain/data=!4m6!4m5!1m1!4e2!1m2!1m1!1s0xd62364e3774824f:0x4d4a0354d820ab69?sa=X&ved=2ahUKEwiBz7ri_KmMAxXTvokEHW20AFIQ48ADegQIMRAA\"}, \"place_id\": \"5569267552135195497\", \"place_id_search\": \"https://serpapi.com/search.json?device=desktop&engine=google&google_domain=google.com&ludocid=5569267552135195497&q=dentistas+en+alicante\", \"gps_coordinates\": {\"latitude\": 38.345894, \"longitude\": -0.4946433}, \"title\": \"Clínica Kranion\", \"type\": \"Dental clinic\", \"phone\": \"+34 965 12 43 65\", \"address\": \"Calle Callosa de Segura, 1\", \"hours\": \"Open ⋅ Closes 7:30 PM\"},{\"position\": 3, \"rating\": 4.9, \"reviews\": 373, \"reviews_original\": \"(373)\", \"lsig\": \"AB86z5VFXEAI1bGALXEE3qH9MLmk\", \"service_options\": {\"onsite_services\": true}, \"links\": {\"website\": \"http://www.clinicainboca.es/\", \"directions\": \"https://www.google.com/maps/dir//Cl%C3%ADnica+Dental+Inboca,+Calle+Coloma+esquina,+Passeig+Esplanada+d'Espanya,+s%2Fn,+03001+Alicante,+Spain/data=!4m6!4m5!1m1!4e2!1m2!1m1!1s0xd6237b3ecac3553:0x7858f3e806b22fe4?sa=X&ved=2ahUKEwiBz7ri_KmMAxXTvokEHW20AFIQ48ADegQIMBAA\"}, \"place_id\": \"8671949260372193252\", \"place_id_search\": \"https://serpapi.com/search.json?device=desktop&engine=google&google_domain=google.com&ludocid=8671949260372193252&q=dentistas+en+alicante\", \"gps_coordinates\": {\"latitude\": 38.34295, \"longitude\": -0.4845093}, \"title\": \"Clínica Dental Inboca\", \"type\": \"Dental clinic\", \"phone\": \"+34 965 29 58 90\", \"address\": \"Calle Coloma esquina, Passeig Esplanada d'Espanya, s/n\", \"hours\": \"Open ⋅ Closes 7:30 PM\"}], \"more_locations_link\": \"https://www.google.com/search?sca_esv=36ca69732928f54b&tbm=lcl&q=dentistas+en+alicante&rflfq=1&num=10&sa=X&ved=2ahUKEwiBz7ri_KmMAxXTvokEHW20AFIQjGp6BAg5EAE\"}]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1040,
+        752
+      ],
+      "id": "b8c96a06-fb75-4b17-97bd-e2989577bd66",
+      "name": "Filtrar Contenido Google"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "facf280e-e8ff-4a9a-8437-b460e2d71a7c",
+              "name": "Place_ID",
+              "value": "={{ $json.Place_ID }}",
+              "type": "string"
+            },
+            {
+              "id": "111647b0-b679-401a-a70c-2c4b5f20a3f6",
+              "name": "URL",
+              "value": "={{ $json.URL }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -544,
+        720
+      ],
+      "id": "dde14895-5c99-49eb-8f70-42b5144fb961",
+      "name": "Preserve Place_ID"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "facf280e-e8ff-4a9a-8437-b460e2d71a7c",
+              "name": "Place_ID",
+              "value": "={{ $('Bucle Descargar Página').item.json.Place_ID }}",
+              "type": "string"
+            },
+            {
+              "id": "111647b0-b679-401a-a70c-2c4b5f20a3f6",
+              "name": "data",
+              "value": "={{ $json.data }}",
+              "type": "string"
+            },
+            {
+              "id": "18dddbdf-1d30-48f3-8381-ffbe00a68ed0",
+              "name": "url",
+              "value": "={{ $('Bucle Descargar Página').item.json.URL }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        48,
+        992
+      ],
+      "id": "85638796-c29e-4cf1-8578-4942325748f1",
+      "name": "Preserve Place_ID1"
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n  const prevItems = $items(\"Read ID\")[0]?.json || [];\n  let maxId = 0;\n  if (prevItems.length > 0) {\n    maxId = Math.max(...prevItems.map(item => {\n      const id = parseInt(item.ID) || 0;\n      return isNaN(id) ? 0 : id;\n    }));\n  }\n  const currentItems = $items(\"Loop Over Items\");\n  if (!currentItems || currentItems.length === 0) {\n    throw new Error(\"No items received from Loop Over Items\");\n  }\n  return currentItems.map((item, index) => {\n    const newItem = { ...item.json };\n    newItem.ID = maxId + index + 1;\n    return { json: newItem };\n  });\n} catch (error) {\n  return [{ json: { error: `Error en Calcular ID: ${error.message}` } }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1024,
+        992
+      ],
+      "id": "42793096-3075-4fb6-ad95-f29663578bcb",
+      "name": "Calcular ID",
+      "disabled": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1sSmICvCO0zVx1E4LAxVlV91H5G8YU0-uDvaYd2QOne8",
+          "mode": "list",
+          "cachedResultName": "WebCorreosNumeros",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sSmICvCO0zVx1E4LAxVlV91H5G8YU0-uDvaYd2QOne8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "SerpAPI Google",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sSmICvCO0zVx1E4LAxVlV91H5G8YU0-uDvaYd2QOne8/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "ID"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -1216,
+        992
+      ],
+      "id": "2346516e-a8fd-4cc4-8c14-2e962f462ee4",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const queries = $items().map(item => item.json.query); // recoge todas las queries del nodo \"Inicio\"\n\nconst results = [];\nfor (const query of queries) {\n  for (let i = 0; i <= 100; i += 20) { // 5 páginas, puedes aumentar a 200, 300...\n    results.push({\n      query,\n      start: i\n    });\n  }\n}\n\nreturn results.map(item => ({ json: item }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1424,
+        752
+      ],
+      "id": "075857ba-8af8-4055-84fb-10209c3eabba",
+      "name": "Function"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1sSmICvCO0zVx1E4LAxVlV91H5G8YU0-uDvaYd2QOne8",
+          "mode": "list",
+          "cachedResultName": "WebCorreosNumeros",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sSmICvCO0zVx1E4LAxVlV91H5G8YU0-uDvaYd2QOne8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1633061532,
+          "mode": "list",
+          "cachedResultName": "Inmobiliarias España",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sSmICvCO0zVx1E4LAxVlV91H5G8YU0-uDvaYd2QOne8/edit#gid=1633061532"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -1056,
+        1424
+      ],
+      "id": "70d1b3cd-e0b8-43d0-a457-1cef4818e03a",
+      "name": "Guardar Email en Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.URL }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "92611b7a-0991-4ec0-8f1e-864fc713e573",
+      "name": "Request web page for URL1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -448,
+        1664
+      ],
+      "typeVersion": 4.2,
+      "alwaysOutputData": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const data = $json.data || '';\nconst emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.(?!png|jpg|gif|jpeg)[a-zA-Z]{2,}/g;\nconst linkRegex = /href=[\"'](.*?)[\"']/g;\n\nconst emails = data.match(emailRegex) || [];\n\nlet links = [];\nif ($json.URL) {\n  try {\n    const baseUrl = new URL($json.URL).origin;\n    let match;\n    while ((match = linkRegex.exec(data)) !== null) {\n      let url = match[1];\n      if (url.startsWith('/')) {\n        url = baseUrl + url;\n      }\n      if (url.match(/contact|about|team|support/i)) {\n        links.push(url);\n      }\n    }\n  } catch (e) {\n    links = [];\n  }\n}\n\nreturn { json: { emails: emails, potentialLinks: links } };"
+      },
+      "id": "a13b8bd8-7306-49b1-8b36-ee29b6b252be",
+      "name": "Scrape emails from page1",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -80,
+        1472
+      ],
+      "typeVersion": 2,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "# Extraer Email Individualmente\n",
+        "height": 580,
+        "width": 1960,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -688,
+        1312
+      ],
+      "typeVersion": 1,
+      "id": "b4061d8d-51cd-4152-8ff0-4f52fc3b854e",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1sSmICvCO0zVx1E4LAxVlV91H5G8YU0-uDvaYd2QOne8",
+          "mode": "list",
+          "cachedResultName": "WebCorreosNumeros",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sSmICvCO0zVx1E4LAxVlV91H5G8YU0-uDvaYd2QOne8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1w93hx4RwzQveCPcvd7dfcItfzWfKihY5IE2lIhRzy1c/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ $json.emails }}",
+            "Place_ID": "={{ $json.Place_ID }}"
+          },
+          "matchingColumns": [
+            "Place_ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Place_ID",
+              "displayName": "Place_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Nombre",
+              "displayName": "Nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Contacto",
+              "displayName": "Contacto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Dirección",
+              "displayName": "Dirección",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ubicación",
+              "displayName": "Ubicación",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        928,
+        1472
+      ],
+      "id": "63267f93-15a0-46cc-8fb2-c5f6693319f2",
+      "name": "Guardar Email en Google Sheets2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const emailsArray = $json.emails || []; // Asegura que sea un array\nconst uniqueEmails = [...new Set(emailsArray)]; // Elimina duplicados\nreturn { json: { ID: $json.ID, emails: uniqueEmails } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        144,
+        1472
+      ],
+      "id": "01266688-0dcb-4c26-8cf7-dd8b24afe6f9",
+      "name": "Eliminar Emails Repetidos1"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "emails"
+            }
+          ]
+        },
+        "options": {
+          "mergeLists": true
+        }
+      },
+      "id": "f5c81df8-9caf-407f-9458-26de1024cb4f",
+      "name": "Guardar Emails como Array1",
+      "type": "n8n-nodes-base.aggregate",
+      "position": [
+        352,
+        1472
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "facf280e-e8ff-4a9a-8437-b460e2d71a7c",
+              "name": "Place_ID",
+              "value": "={{ $('Bucle Descargar Página1').item.json.Place_ID }}",
+              "type": "string"
+            },
+            {
+              "id": "111647b0-b679-401a-a70c-2c4b5f20a3f6",
+              "name": "emails",
+              "value": "={{ $json.emails }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        544,
+        1472
+      ],
+      "id": "863c16ac-0d06-44a8-8218-80c0e341d0ce",
+      "name": "Email Preserve ID1"
+    },
+    {
+      "parameters": {
+        "batchSize": 5,
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "c243d424-dc99-4acd-9fa7-3b67bcafc4f5",
+      "name": "Bucle Descargar Página1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        -576,
+        1424
+      ],
+      "typeVersion": 3,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -304,
+        1392
+      ],
+      "id": "fddecce4-7556-4acd-bc24-2962c3435cae",
+      "name": "Bucle Extraer Emails1",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "let emailsString = $json.emails || ''; // Obtiene la cadena o usa vacío si no hay nada\n\n// Si hay datos, convierte la cadena serializada en array y luego en cadena simple\nlet emailsResult = '';\nif (emailsString) {\n  try {\n    const emailsArray = JSON.parse(emailsString); // Parsea la cadena JSON a array\n    emailsResult = emailsArray.join(', '); // Une los elementos con coma y espacio\n  } catch (e) {\n    emailsResult = emailsString; // Si falla el parseo, usa la cadena original como fallback\n  }\n}\n\n// Devuelve el resultado con el ID\nreturn { json: { Place_ID: $json.Place_ID, emails: emailsResult } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        1472
+      ],
+      "id": "03d6c6f7-62d2-43fc-a790-35571c76c59e",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1120,
+        1472
+      ],
+      "id": "6ebc750e-29c5-4827-afe1-04b45f7e4ffc",
+      "name": "Wait",
+      "webhookId": "38bac717-4d73-4974-bc32-e2b160ff6be9"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "facf280e-e8ff-4a9a-8437-b460e2d71a7c",
+              "name": "Place_ID",
+              "value": "={{ $json.Place_ID }}",
+              "type": "string"
+            },
+            {
+              "id": "111647b0-b679-401a-a70c-2c4b5f20a3f6",
+              "name": "URL",
+              "value": "={{ $json.URL }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -816,
+        1424
+      ],
+      "id": "e32dedfa-2d8e-400c-bc37-ced0627ff1ef",
+      "name": "Preserve Place_ID2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "facf280e-e8ff-4a9a-8437-b460e2d71a7c",
+              "name": "Place_ID",
+              "value": "={{ $('Bucle Descargar Página1').item.json.Place_ID }}",
+              "type": "string"
+            },
+            {
+              "id": "111647b0-b679-401a-a70c-2c4b5f20a3f6",
+              "name": "data",
+              "value": "={{ $json.data }}",
+              "type": "string"
+            },
+            {
+              "id": "18dddbdf-1d30-48f3-8381-ffbe00a68ed0",
+              "name": "url",
+              "value": "={{ $('Bucle Descargar Página1').item.json.URL }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -240,
+        1664
+      ],
+      "id": "0bf3ae77-d174-41fa-832f-6d73b8351ec1",
+      "name": "Preserve Place_ID3"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1280,
+        1424
+      ],
+      "id": "513484ac-5748-472d-a420-558ae06dd013",
+      "name": "Schedule Trigger",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1sSmICvCO0zVx1E4LAxVlV91H5G8YU0-uDvaYd2QOne8",
+          "mode": "list",
+          "cachedResultName": "WebCorreosNumeros",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sSmICvCO0zVx1E4LAxVlV91H5G8YU0-uDvaYd2QOne8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1633061532,
+          "mode": "list",
+          "cachedResultName": "Inmobiliarias España",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sSmICvCO0zVx1E4LAxVlV91H5G8YU0-uDvaYd2QOne8/edit#gid=1633061532"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nombre": "={{ $json.local_results.title }}",
+            "Contacto": "=\"{{ $json.local_results.phone }}\"",
+            "Dirección": "={{ $json.local_results.address }}",
+            "Ubicación": "={{ $json.local_results.links.directions }}",
+            "URL": "={{ $json.local_results.links.website }}",
+            "Place_ID": "={{ $json.local_results.place_id }}"
+          },
+          "matchingColumns": [
+            "Place_ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Place_ID",
+              "displayName": "Place_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Nombre",
+              "displayName": "Nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Contacto",
+              "displayName": "Contacto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Dirección",
+              "displayName": "Dirección",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Ubicación",
+              "displayName": "Ubicación",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -800,
+        960
+      ],
+      "id": "f3c06c8b-29df-4b91-9a68-6c7ba4d7c0a7",
+      "name": "Guardar Información",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1sSmICvCO0zVx1E4LAxVlV91H5G8YU0-uDvaYd2QOne8",
+          "mode": "list",
+          "cachedResultName": "WebCorreosNumeros",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sSmICvCO0zVx1E4LAxVlV91H5G8YU0-uDvaYd2QOne8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1633061532,
+          "mode": "list",
+          "cachedResultName": "Inmobiliarias España",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1sSmICvCO0zVx1E4LAxVlV91H5G8YU0-uDvaYd2QOne8/edit#gid=1633061532"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ $json.emails }}",
+            "Place_ID": "={{ $json.Place_ID }}"
+          },
+          "matchingColumns": [
+            "Place_ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Place_ID",
+              "displayName": "Place_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Nombre",
+              "displayName": "Nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Contacto",
+              "displayName": "Contacto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Dirección",
+              "displayName": "Dirección",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ubicación",
+              "displayName": "Ubicación",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1040,
+        752
+      ],
+      "id": "8e9251af-8350-46c7-b745-b69f2815dad0",
+      "name": "Guardar Emails",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "amount": 0.5
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -576,
+        960
+      ],
+      "id": "2886b148-e2cd-4399-be71-5ca5e6fb56b6",
+      "name": "Wait2",
+      "webhookId": "5763e65b-a6d4-4c9e-a4a9-8b05e238f1b7"
+    }
+  ],
+  "pinData": {
+    "Inicio": [
+      {
+        "json": {
+          "query": "inmobiliaria+España"
+        }
+      },
+      {
+        "json": {
+          "query": "agencia+inmobiliaria+España"
+        }
+      },
+      {
+        "json": {
+          "query": "bienes+raíces+en+España"
+        }
+      },
+      {
+        "json": {
+          "query": "venta+de+casas+en+España"
+        }
+      },
+      {
+        "json": {
+          "query": "compra+de+apartamentos+en+España"
+        }
+      },
+      {
+        "json": {
+          "query": "inmobiliaria+de+lujo+España"
+        }
+      },
+      {
+        "json": {
+          "query": "alquiler+de+piso+en+España"
+        }
+      },
+      {
+        "json": {
+          "query": "agente+inmobiliario+en+España"
+        }
+      },
+      {
+        "json": {
+          "query": "vivienda+en+venta+España"
+        }
+      },
+      {
+        "json": {
+          "query": "real+estate+agency+Spain"
+        }
+      },
+      {
+        "json": {
+          "query": "real+estate+Spain"
+        }
+      },
+      {
+        "json": {
+          "query": "comprar+villa+en+España"
+        }
+      },
+      {
+        "json": {
+          "query": "casas+de+lujo+en+España"
+        }
+      },
+      {
+        "json": {
+          "query": "propiedades+en+España"
+        }
+      },
+      {
+        "json": {
+          "query": "pisos+en+venta+en+España"
+        }
+      },
+      {
+        "json": {
+          "query": "apartamentos+en+España"
+        }
+      },
+      {
+        "json": {
+          "query": "alquiler+de+lujo+en+España"
+        }
+      },
+      {
+        "json": {
+          "query": "casas+baratas+en+España"
+        }
+      },
+      {
+        "json": {
+          "query": "venta+de+villas+en+España"
+        }
+      },
+      {
+        "json": {
+          "query": "oficinas+en+alquiler+España"
+        }
+      },
+      {
+        "json": {
+          "query": "locales+comerciales+en+España"
+        }
+      },
+      {
+        "json": {
+          "query": "agente+de+bienes+raíces+en+España"
+        }
+      },
+      {
+        "json": {
+          "query": "nueva+construcción+en+España"
+        }
+      },
+      {
+        "json": {
+          "query": "proyectos+inmobiliarios+en+España"
+        }
+      },
+      {
+        "json": {
+          "query": "propiedades+de+lujo+en+España"
+        }
+      },
+      {
+        "json": {
+          "query": "casas+en+la+costa+española"
+        }
+      },
+      {
+        "json": {
+          "query": "mejores+inmobiliarias+en+España"
+        }
+      },
+      {
+        "json": {
+          "query": "venta+de+casas+frente+al+mar+en+España"
+        }
+      },
+      {
+        "json": {
+          "query": "departamentos+en+venta+en+España"
+        }
+      },
+      {
+        "json": {
+          "query": "rentar+apartamento+en+España"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Preserve Place_ID",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Guardar Información",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inicio": {
+      "main": [
+        [
+          {
+            "node": "Function",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request web page for URL": {
+      "main": [
+        [
+          {
+            "node": "Preserve Place_ID1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape emails from page": {
+      "main": [
+        [
+          {
+            "node": "Eliminar Emails Repetidos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Eliminar Emails Repetidos": {
+      "main": [
+        [
+          {
+            "node": "Guardar Emails como Array",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Emails como Array": {
+      "main": [
+        [
+          {
+            "node": "Email Preserve ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Preserve ID": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bucle Descargar Página": {
+      "main": [
+        [
+          {
+            "node": "Bucle Extraer Emails",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Request web page for URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bucle Extraer Emails": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Scrape emails from page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Guardar Emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Bucle Extraer Emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI Google": {
+      "main": [
+        [
+          {
+            "node": "Filtrar Contenido Google",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrar Contenido Google": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preserve Place_ID": {
+      "main": [
+        [
+          {
+            "node": "Bucle Descargar Página",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preserve Place_ID1": {
+      "main": [
+        [
+          {
+            "node": "Bucle Descargar Página",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calcular ID": {
+      "main": [
+        []
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Calcular ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function": {
+      "main": [
+        [
+          {
+            "node": "SerpAPI Google",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request web page for URL1": {
+      "main": [
+        [
+          {
+            "node": "Preserve Place_ID3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape emails from page1": {
+      "main": [
+        [
+          {
+            "node": "Eliminar Emails Repetidos1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Email en Google Sheets2": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Eliminar Emails Repetidos1": {
+      "main": [
+        [
+          {
+            "node": "Guardar Emails como Array1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Emails como Array1": {
+      "main": [
+        [
+          {
+            "node": "Email Preserve ID1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Preserve ID1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bucle Descargar Página1": {
+      "main": [
+        [
+          {
+            "node": "Bucle Extraer Emails1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Request web page for URL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bucle Extraer Emails1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Scrape emails from page1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Guardar Email en Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Bucle Extraer Emails1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preserve Place_ID2": {
+      "main": [
+        [
+          {
+            "node": "Bucle Descargar Página1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preserve Place_ID3": {
+      "main": [
+        [
+          {
+            "node": "Bucle Descargar Página1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Email en Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Preserve Place_ID2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Guardar Email en Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Información": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Emails": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e43a2f16-680c-434c-8e9b-ede073951a75",
+  "meta": {
+    "instanceId": "91e9bc2fd2d08736422cccee7e1506bda336e368f82dcb792c9d1bbf6348503c"
+  },
+  "id": "by0bdhxXcbfb8TE5",
+  "tags": []
+}

@@ -1,0 +1,507 @@
+{
+  "name": "Prueba Calendar",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "=info@smartcalls.biz",
+          "mode": "id"
+        },
+        "timeMax": "={{ $now.plus({ week: 2 }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        48,
+        80
+      ],
+      "id": "03f6c2de-e987-4a2e-aa51-6be3ad162abd",
+      "name": "Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "YK6fMdm5f9By1r6e",
+          "name": "Google Calendar SmartCalls"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "fromEmail": "no-reply@smartcalls.biz",
+        "toEmail": "=info@smartcalls.biz",
+        "subject": "SmartCalls",
+        "emailFormat": "text",
+        "text": "=Se confirmar nuestra reunión con {{ $json.nombre }}, programada para el {{ $json.fecha_meet }} a las {{ $json.hora_meet_nueva }}. La reunión se realizará a través de la pltaforma de videollamada Google Meet.\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1728,
+        144
+      ],
+      "id": "d128e4cb-83b5-4ecd-aa76-b08f27775b4f",
+      "name": "Correo Verificación Nuestro",
+      "webhookId": "e1dbea9c-06bd-4f05-9263-bd5d5df944e2",
+      "credentials": {
+        "smtp": {
+          "id": "Dx9eTPsVTPlyb1CQ",
+          "name": "SMTP SmartCalls"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "fromEmail": "no-reply@smartcalls.biz",
+        "toEmail": "={{ $('Bucle Llamadas').item.json.email }}",
+        "subject": "Confirmación de tu reunión con SmartCalls",
+        "emailFormat": "text",
+        "text": "=Estimado {{ $('Loop Over Items3').item.json.nombre }},\n\n¡Gracias por agendar una reunión con el equipo de SmartCalls!\n\n\nTe confirmamos que nuestra videollamada está programada para el {{ $('Loop Over Items3').item.json.fecha_meet }} a las {{ $('Loop Over Items3').item.json.hora_meet_nueva }}. Nos conectaremos a través de la plataforma Google Meet para conocerte mejor, entender tu negocio y explicarte cómo nuestros agentes de voz con inteligencia artificial pueden ayudarte a automatizar procesos y mejorar tu atención al cliente.\n\nSi tienes cualquier duda o inconveniente antes de la reunión, no dudes en contactarnos. Estaremos encantados de ayudarte.\n\nSitio web: smartcalls.biz\nEmail: info@smartcalls.biz\n\n¡Nos vemos muy pronto!\n\nUn cordial saludo,\nEl equipo de SmartCalls",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1904,
+        144
+      ],
+      "id": "5ac6e9a6-cc60-4c9b-b2cd-2d3e51774515",
+      "name": "Correo Verificación Cliente",
+      "webhookId": "e1dbea9c-06bd-4f05-9263-bd5d5df944e2",
+      "credentials": {
+        "smtp": {
+          "id": "Dx9eTPsVTPlyb1CQ",
+          "name": "SMTP SmartCalls"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e72b5ae6-3fee-4b62-8c08-2449d6862ba9",
+              "name": "nombre",
+              "value": "={{ $('Bucle Llamadas').item.json.summary }}",
+              "type": "string"
+            },
+            {
+              "id": "fd810296-0902-4b12-8a37-96e628daa024",
+              "name": "email_cliente",
+              "value": "={{ $('Bucle Llamadas').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "45da3f8f-1a3f-44b9-9556-a7eb8c662080",
+              "name": "hora_meet",
+              "value": "={{ $json.start.dateTime }}",
+              "type": "string"
+            },
+            {
+              "id": "78d0c73e-515a-450a-943d-52fe1d85b1e2",
+              "name": "description",
+              "value": "={{ $json.description }}",
+              "type": "string"
+            },
+            {
+              "id": "22db8ebe-1318-47c8-ac90-e7fcbefa5404",
+              "name": "email_empresa",
+              "value": "={{ $json.attendees[0].email }}",
+              "type": "string"
+            },
+            {
+              "id": "6a0ce824-b068-4259-9045-1dd9c8175152",
+              "name": "is_contacted",
+              "value": 0,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        80
+      ],
+      "id": "e87e19c4-a4c3-4576-b360-d419dbb6eddb",
+      "name": "Edit Fields",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        752,
+        80
+      ],
+      "id": "6ffcdb9e-12e7-438d-8382-c39bdff225e7",
+      "name": "Loop Over Items",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener el texto del campo \"description\" del primer ítem\nconst description = $input.first().json.description;\n\n// Dividir el texto en líneas\nconst lines = description.split('\\n');\n\n// Variables para almacenar los datos extraídos\nlet meetLink = '';\nlet phoneNumber = '';\nlet phoneFound = false;\n\n// Recorrer las líneas para buscar los datos\nfor (const line of lines) {\n  // Enlace del Meet (línea con \"https://meet.google.com\")\n  if (line.includes('https://meet.google.com')) {\n    meetLink = line.trim();\n  }\n  // Número de teléfono (línea después de \"telefono:\")\n  if (phoneFound) {\n    phoneNumber = line.trim();\n    phoneFound = false; // Resetear para no seguir buscando\n  }\n  if (line.trim() === 'telefono:') {\n    phoneFound = true; // Marcar que la siguiente línea es el número\n  }\n}\n\n// Devolver los datos extraídos junto con los datos del JSON original\nreturn [{\n  json: {\n    nombre: $input.first().json.nombre,\n    email_cliente: $input.first().json.email_cliente,\n    hora_meet: $input.first().json.hora_meet,\n    meetLink: meetLink,\n    phoneNumber: phoneNumber\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1168,
+        80
+      ],
+      "id": "bda24e48-e6f6-4049-8450-720f34f78c3a",
+      "name": "CodeFiltrarDatosCalendar",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener el primer ítem del input\nconst item = $input.first().json;\n\n// Parsear la fecha del campo \"hora_meet\" para la fecha\nconst fechaOriginal = new Date(item.hora_meet);\n\n// Extraer día, mes y año\nconst dia = fechaOriginal.getDate().toString().padStart(2, '0');\nconst mes = (fechaOriginal.getMonth() + 1).toString().padStart(2, '0');\nconst anio = fechaOriginal.getFullYear();\n\n// Extraer la hora y los minutos directamente del string ISO\nconst horaMeetString = item.hora_meet; // \"2025-04-11T17:00:00+02:00\"\nconst horaPartes = horaMeetString.split('T')[1].split(':'); // [\"17\", \"00\", \"00+02:00\"]\nconst horas = horaPartes[0]; // \"17\"\nconst minutos = horaPartes[1]; // \"00\"\n\n// Formatear la fecha y la hora\nconst fechaMeet = `${dia}-${mes}-${anio}`;\nconst horaMeetNueva = `${horas}:${minutos}`;\n\n// Devolver el objeto con los campos originales más los nuevos\nreturn [{\n  json: {\n    nombre: item.nombre,\n    email_cliente: item.email_cliente,\n    meetLink: item.meetLink,\n    phoneNumber: item.phoneNumber,\n    fecha_meet: fechaMeet,\n    hora_meet_nueva: horaMeetNueva\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        80
+      ],
+      "id": "064c709e-1a8b-435c-a39d-393ef4ea6e2a",
+      "name": "CodeHora",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1520,
+        112
+      ],
+      "id": "c9f9b2e2-7f1d-4da3-b65d-297e2d753c52",
+      "name": "Loop Over Items3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1b25bc2d-ec6a-435b-847b-5aadb25e7d3c",
+              "leftValue": "={{ $json.is_contacted }}",
+              "rightValue": "=False",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        928,
+        112
+      ],
+      "id": "aa2889ed-7ebd-4b12-99de-5ee4bb715187",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "content": "# Verificar Evento\n\n",
+        "height": 340,
+        "width": 2080,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -64,
+        -16
+      ],
+      "typeVersion": 1,
+      "id": "d0b3ceca-cf5f-4ebd-8d30-757dfd845d29",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "table": {
+          "__rl": true,
+          "value": "customer",
+          "mode": "list",
+          "cachedResultName": "customer"
+        },
+        "dataMode": "defineBelow",
+        "columnToMatchOn": "place_id",
+        "valueToMatchOn": "={{ $('Bucle Llamadas').item.json.place_id }}",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "scheduled",
+              "value": "=1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "158d2ea3-b08f-478d-bc6c-14479fd091f6",
+      "name": "Scheduled",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        432,
+        80
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "16435322-2f08-4433-9be0-be3176cedf0b",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        112
+      ],
+      "id": "04f9ed1b-0136-46fa-8c65-84c3ecf9c7fc",
+      "name": "Error Reserva"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        80
+      ],
+      "id": "4513aaac-eb10-463b-b22e-1a9d6f89ab25",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "resource": "calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "smartcallsworld@gmail.com",
+          "mode": "list",
+          "cachedResultName": "smartcallsworld@gmail.com"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        704,
+        -240
+      ],
+      "id": "53149f69-f83b-4f13-9a84-a13b216b204e",
+      "name": "Google Calendar1",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "YK6fMdm5f9By1r6e",
+          "name": "Google Calendar SmartCalls"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Calendar": {
+      "main": [
+        [
+          {
+            "node": "Error Reserva",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Correo Verificación Nuestro": {
+      "main": [
+        [
+          {
+            "node": "Correo Verificación Cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Correo Verificación Cliente": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CodeFiltrarDatosCalendar": {
+      "main": [
+        [
+          {
+            "node": "CodeHora",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CodeHora": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Correo Verificación Nuestro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "CodeFiltrarDatosCalendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scheduled": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Reserva": {
+      "main": [
+        [
+          {
+            "node": "Scheduled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a975a35d-5c5e-443a-99e7-1ff4f3f3f135",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "91e9bc2fd2d08736422cccee7e1506bda336e368f82dcb792c9d1bbf6348503c"
+  },
+  "id": "Avaf9qp796tVzjPq",
+  "tags": []
+}

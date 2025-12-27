@@ -1,0 +1,518 @@
+{
+  "name": "💾 Visualizador DB",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT COUNT(*) AS total FROM customer WHERE ORIGIN_ID = 5;",
+        "options": {}
+      },
+      "id": "6030dd7f-471a-480c-a351-84a75b865718",
+      "name": "Total APIS",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        0,
+        -128
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT COUNT(*) AS total FROM customer WHERE ORIGIN_ID = 5 AND is_contacted = 0;",
+        "options": {}
+      },
+      "id": "894bf09c-4fbe-43d1-8c4e-12fecd1788f1",
+      "name": "is_contactec = 0",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        400,
+        -128
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT COUNT(*) AS total FROM customer WHERE ORIGIN_ID = 5 AND is_contacted = 1;",
+        "options": {}
+      },
+      "id": "93bc71bc-1428-40ac-8ebf-1c32f06bd38d",
+      "name": "is_contacted= 1",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        608,
+        -128
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT COUNT(*) AS total FROM customer WHERE ORIGIN_ID = 5 AND call_attempts = 1;",
+        "options": {}
+      },
+      "id": "a8052fab-1412-4011-be7d-c54561e376ba",
+      "name": "call_attempts = 1",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        960,
+        -128
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT COUNT(*) AS total FROM customer WHERE ORIGIN_ID = 5 AND call_attempts = 0;",
+        "options": {}
+      },
+      "id": "a2f8daef-198e-4d39-b6b8-7787bf3095b5",
+      "name": "call_attempts = 0",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        784,
+        -128
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648",
+          "mode": "list",
+          "cachedResultName": "N8N Optima",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "SmartCalls 2.0",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Total Customer": "={{ $('Total APIS').item.json.total }}",
+            "call_attempt = 0": "={{ $('call_attempts = 0').item.json.total }}",
+            "is_contacted = 0": "={{ $('is_contactec = 0').item.json.total }}",
+            "is_contected = 1": "={{ $('is_contacted= 1').item.json.total }}",
+            "call_attempt = 1": "={{ $('call_attempts = 1').item.json.total }}",
+            "Total Contact Customer": "={{ $('Total ContactCustomer').item.json.total }}",
+            "Scheduled = 1": "={{ $('Scheduled').item.json.total }}",
+            "File": "1",
+            "Pixel": "={{ $('Pixel').item.json['COUNT(*)'] }}"
+          },
+          "matchingColumns": [
+            "File"
+          ],
+          "schema": [
+            {
+              "id": "File",
+              "displayName": "File",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Total Customer",
+              "displayName": "Total Customer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Total Contact Customer",
+              "displayName": "Total Contact Customer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is_contacted = 0",
+              "displayName": "is_contacted = 0",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_contected = 1",
+              "displayName": "is_contected = 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "call_attempt = 0",
+              "displayName": "call_attempt = 0",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "call_attempt = 1",
+              "displayName": "call_attempt = 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Scheduled = 1",
+              "displayName": "Scheduled = 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Pixel",
+              "displayName": "Pixel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1728,
+        -128
+      ],
+      "id": "0b08e467-ec1a-467b-97cb-388aad471c55",
+      "name": "Registrar Número de Items",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        -48
+      ],
+      "id": "ed73e1f6-7137-478e-a490-76a8ed3ad9b6",
+      "name": "Inicio"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT COUNT(*) AS total FROM contactcustomer;",
+        "options": {}
+      },
+      "id": "15b0f13a-e17f-4d5d-bc22-4c58332abc36",
+      "name": "Total ContactCustomer",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        208,
+        -128
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT COUNT(*) AS total FROM customer WHERE ORIGIN_ID = 5 AND scheduled = 1;",
+        "options": {}
+      },
+      "id": "6ba07e05-ccfe-4d7c-81bf-55f04297d500",
+      "name": "Scheduled",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        1152,
+        -128
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -208,
+        -224
+      ],
+      "id": "a9075e9d-405e-4b49-805d-6497355b9ab5",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "amount": 0.01
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1552,
+        -128
+      ],
+      "id": "d9caa34d-7bd6-40bf-aea3-d6117d5ef34b",
+      "name": "Wait",
+      "webhookId": "9f358bea-91ea-4fec-8995-a8e2c6044198"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT COUNT(*) FROM pixel",
+        "options": {}
+      },
+      "id": "76321ed7-16a7-4f63-86fc-43699f533a14",
+      "name": "Pixel",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        1344,
+        -128
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Total APIS": {
+      "main": [
+        [
+          {
+            "node": "Total ContactCustomer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "is_contactec = 0": {
+      "main": [
+        [
+          {
+            "node": "is_contacted= 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "is_contacted= 1": {
+      "main": [
+        [
+          {
+            "node": "call_attempts = 0",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "call_attempts = 0": {
+      "main": [
+        [
+          {
+            "node": "call_attempts = 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "call_attempts = 1": {
+      "main": [
+        [
+          {
+            "node": "Scheduled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inicio": {
+      "main": [
+        [
+          {
+            "node": "Total APIS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Total ContactCustomer": {
+      "main": [
+        [
+          {
+            "node": "is_contactec = 0",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scheduled": {
+      "main": [
+        [
+          {
+            "node": "Pixel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Total APIS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar Número de Items": {
+      "main": [
+        []
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Registrar Número de Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pixel": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f79fc72b-da9e-47bf-b7be-eacc21edd9cc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "91e9bc2fd2d08736422cccee7e1506bda336e368f82dcb792c9d1bbf6348503c"
+  },
+  "id": "nNcTgoufTRWeVs0n",
+  "tags": []
+}

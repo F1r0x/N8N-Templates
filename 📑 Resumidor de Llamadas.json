@@ -1,0 +1,959 @@
+{
+  "name": "📑 Resumidor de Llamadas",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1616,
+        800
+      ],
+      "id": "c3417b03-50e4-4db4-bd8a-75b629512015",
+      "name": "Inicio"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT COUNT(transcription) AS total FROM contactcustomer WHERE place_id = '{{ $json.place_id }}';",
+        "options": {}
+      },
+      "id": "b975630d-98b5-4990-b91d-c38f3efb37dc",
+      "name": "Contactcustomer",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        -928,
+        832
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "GPT-3.5-TURBO"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Actúas como un analista experto en conversaciones de ventas telefónicas automatizadas.\n\nTu tarea es analizar cuidadosamente la siguiente transcripción de una llamada entre un asistente de IA y un cliente, y devolver un único objeto JSON con la siguiente estructura:\n\n{\n  \"id\": {{ $json.id }},\n  \"valoracion\": \"Positiva\" | \"Negativa\"\n}\n\n### Criterios estrictos para \"valoracion\":\n\n- \"Positiva\" solo si:\n  - El cliente participa activamente (mínimo dos intervenciones),\n  - Muestra interés real, hace preguntas relevantes o **acepta agendar una cita**,\n  - Y la conversación es fluida, sin señales de rechazo.\n\n- \"Negativa\" si:\n  - El cliente apenas interviene (una sola respuesta breve, monosílabos o cuelga),\n  - O muestra rechazo, evasión, sarcasmo, molestias o desinterés.\n\n**Importante:** No incluyas ninguna explicación. Responde exclusivamente con el objeto JSON **válido y bien formado**.\n\n### Transcripción:\n{{ $json.transcription }}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -80,
+        624
+      ],
+      "id": "e7c6ba8a-cbf6-4a99-9eaf-8027c95d88ac",
+      "name": "Patrón de LLamadas1",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1168,
+        800
+      ],
+      "id": "d18b5939-ef46-4fa1-acbe-31f8dc2abe98",
+      "name": "Bucle por PlaceID"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -304,
+        592
+      ],
+      "id": "eb65de06-894e-4ca4-ad07-c7d43726167a",
+      "name": "Bucle por llamada"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "86ecd555-157e-4f34-89d6-ff82ce8e0725",
+              "leftValue": "={{ $json.transcripcion_dividida.valoracion }}",
+              "rightValue": "Positiva",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        624
+      ],
+      "id": "140e3fd9-176e-4df8-82ab-da8e515fc096",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "let content = items[0].json.message.content;\n\ntry {\n  const parsedArray = JSON.parse(content); // esto es un array\n  return [{\n    json: {\n      transcripcion_dividida: parsedArray //Comprueba si es un objeto\n    }\n  }];\n} catch (err) {\n  return [{\n    json: {\n      error: 'No es un JSON válido',\n      content\n    }\n  }];\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        624
+      ],
+      "id": "b48d8e8f-e6e5-4f1d-8de0-718a0811bf11",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, recording, call_id, date FROM contactcustomer WHERE id = {{ $json.id }};",
+        "options": {}
+      },
+      "id": "ae8c642b-4913-4a60-bbfa-f69efe406b71",
+      "name": "Contactcustomer2",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        640,
+        608
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648",
+          "mode": "list",
+          "cachedResultName": "N8N Optima",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1926900702,
+          "mode": "list",
+          "cachedResultName": "Transcripciones",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648/edit#gid=1926900702"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json.id }}",
+            "Recording": "={{ $json.recording }}",
+            "Call_ID": "=https://dashboard.retellai.com/callHistory?history={{ $json.call_id }}",
+            "Fecha": "={{ $json.fechaFormateada }}",
+            "Hora": "={{ $json.horaFormateada }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Hora",
+              "displayName": "Hora",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Call_ID",
+              "displayName": "Call_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Recording",
+              "displayName": "Recording",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1072,
+        608
+      ],
+      "id": "3eac9bd0-c3ca-4b39-aa91-e7342e22bd91",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT DISTINCT place_id\nFROM contactcustomer\nWHERE date >= NOW() - INTERVAL 5 DAY;\n",
+        "options": {}
+      },
+      "id": "16eee040-1d8b-4f11-a98e-4775a3f2ee96",
+      "name": "Obtener place_ids",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        -1424,
+        800
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a76e5dc6-e0f1-4648-8df1-3d4afb45997c",
+              "leftValue": "={{ $json.total }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -704,
+        832
+      ],
+      "id": "9f5e3748-8a08-4957-a66e-899e29afae4f",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "GPT-3.5-TURBO"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Actúas como un analista experto en conversaciones de ventas telefónicas automatizadas.\n\nTu tarea es analizar cuidadosamente la siguiente transcripción de una llamada entre un asistente de IA y un cliente, y devolver un único objeto JSON con la siguiente estructura:\n\n{\n  \"id\": {{ $json.id }},\n  \"valoracion\": \"Positiva\" | \"Negativa\"\n}\n\n### Criterios estrictos para \"valoracion\":\n\n- \"Positiva\" solo si:\n  - El cliente participa activamente (mínimo dos intervenciones),\n  - Muestra interés real, hace preguntas relevantes o **acepta agendar una cita**,\n  - Y la conversación es fluida, sin señales de rechazo.\n\n- \"Negativa\" si:\n  - El cliente apenas interviene (una sola respuesta breve, monosílabos o cuelga),\n  - O muestra rechazo, evasión, sarcasmo, molestias o desinterés.\n\n**Importante:** No incluyas ninguna explicación. Responde exclusivamente con el objeto JSON **válido y bien formado**.\n\n### Transcripción:\n{{ $json.transcription }}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -160,
+        848
+      ],
+      "id": "9ac8eac8-d9f7-4214-a10d-6d97f901f371",
+      "name": "Patrón de LLamadas",
+      "credentials": {
+        "openAiApi": {
+          "id": "eEJ7dY14gZuZ6XoB",
+          "name": "OpenAi Optima Quantum"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "86ecd555-157e-4f34-89d6-ff82ce8e0725",
+              "leftValue": "={{ $json.transcripcion_dividida.valoracion }}",
+              "rightValue": "Positiva",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        304,
+        848
+      ],
+      "id": "6d4e6a40-08c9-4681-9aa9-7bca125eda46",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "jsCode": "let content = items[0].json.message.content;\n\ntry {\n  const parsedArray = JSON.parse(content); // esto es un array\n  return [{\n    json: {\n      transcripcion_dividida: parsedArray //Comprueba si es un objeto\n    }\n  }];\n} catch (err) {\n  return [{\n    json: {\n      error: 'No es un JSON válido',\n      content\n    }\n  }];\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        144,
+        848
+      ],
+      "id": "baaa309b-7112-4151-9c4d-bbf94ed05b07",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, recording, call_id, date FROM contactcustomer WHERE id = {{ $json.id }};",
+        "options": {}
+      },
+      "id": "3ab01d43-b955-48a1-8bb4-f541a9769224",
+      "name": "Contactcustomer3",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        544,
+        848
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648",
+          "mode": "list",
+          "cachedResultName": "N8N Optima",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1926900702,
+          "mode": "list",
+          "cachedResultName": "Transcripciones",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kvXx2CWr00ZgowTo2W064EI0R4BuKwMJTnetrjAi648/edit#gid=1926900702"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json.id }}",
+            "Recording": "={{ $json.recording }}",
+            "Call_ID": "=https://dashboard.retellai.com/callHistory?history={{ $json.call_id }}",
+            "Fecha": "={{ $json.fechaFormateada }}",
+            "Hora": "={{ $json.horaFormateada }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Hora",
+              "displayName": "Hora",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Call_ID",
+              "displayName": "Call_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Recording",
+              "displayName": "Recording",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1088,
+        928
+      ],
+      "id": "e54a0415-a43a-4ef2-aa93-f6b9c6944435",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, transcription FROM contactcustomer WHERE place_id = '{{ $('Bucle por PlaceID').item.json.place_id }}';",
+        "options": {}
+      },
+      "id": "8c49fe20-1f34-48b6-b71c-c3e93c04e789",
+      "name": "Contactcustomer1",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        -496,
+        592
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, transcription, date FROM contactcustomer WHERE place_id = '{{ $('Bucle por PlaceID').item.json.place_id }}';",
+        "options": {}
+      },
+      "id": "032363cc-1d6f-4829-9ee3-c97d4c4bd0a7",
+      "name": "Contactcustomer4",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        -496,
+        848
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "mySql": {
+          "id": "l3Xgr9sCVnJ3NZHu",
+          "name": "MySQL account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5287f0b5-0513-488c-b1b8-b1ac1229463c",
+              "leftValue": "={{ $json.transcription }}",
+              "rightValue": "null",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -336,
+        848
+      ],
+      "id": "db0b4309-f995-44f8-90d6-5a4ecc351c45",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst dateStr = item.date; // ejemplo: \"2025-05-07 12:49:18\"\n\n// Separar fecha y hora\nconst [fecha, hora] = dateStr.split(' ');\n\n// Extraer partes\nconst [anio, mes, dia] = fecha.split('-');\nconst horaFormateada = hora.slice(0, 5); // solo HH:MM\n\n// Meses en español\nconst meses = [\n  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',\n  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'\n];\n\nconst fechaFormateada = `${parseInt(dia, 10)} de ${meses[parseInt(mes, 10) - 1]} de ${anio}`;\n\n// Devolver todo lo original + los nuevos campos\nreturn [{\n  json: {\n    ...item,\n    fechaFormateada,\n    horaFormateada\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        608
+      ],
+      "id": "0503f6a2-76ac-4464-a267-050cb13915f6",
+      "name": "Fortmatear Hora1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst dateStr = item.date; // ejemplo: \"2025-05-07 12:49:18\"\n\n// Separar fecha y hora\nconst [fecha, hora] = dateStr.split(' ');\n\n// Extraer partes\nconst [anio, mes, dia] = fecha.split('-');\nconst horaFormateada = hora.slice(0, 5); // solo HH:MM\n\n// Meses en español\nconst meses = [\n  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',\n  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'\n];\n\nconst fechaFormateada = `${parseInt(dia, 10)} de ${meses[parseInt(mes, 10) - 1]} de ${anio}`;\n\n// Devolver todo lo original + los nuevos campos\nreturn [{\n  json: {\n    ...item,\n    fechaFormateada,\n    horaFormateada\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        864
+      ],
+      "id": "a151bdaa-b618-461a-b920-516b2fd64993",
+      "name": "Fortmatear Hora2"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1280,
+        608
+      ],
+      "id": "39e3b305-3744-4246-aeb6-acc4cf3503ff",
+      "name": "Wait",
+      "webhookId": "bde0e6c7-4223-43b6-b61d-9c8823dc9596"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1312,
+        928
+      ],
+      "id": "ad44cd41-8f1a-4614-9eb5-bee62d1d8723",
+      "name": "Wait1",
+      "webhookId": "771ff6a7-7e4c-4b0b-aeca-7a16c8c9517c"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Inicio": {
+      "main": [
+        [
+          {
+            "node": "Obtener place_ids",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contactcustomer": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bucle por PlaceID": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Contactcustomer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bucle por llamada": {
+      "main": [
+        [
+          {
+            "node": "Bucle por PlaceID",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Patrón de LLamadas1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Patrón de LLamadas1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Contactcustomer2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Bucle por llamada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contactcustomer2": {
+      "main": [
+        [
+          {
+            "node": "Fortmatear Hora1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener place_ids": {
+      "main": [
+        [
+          {
+            "node": "Bucle por PlaceID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Contactcustomer1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Contactcustomer4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Patrón de LLamadas": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Contactcustomer3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Bucle por PlaceID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contactcustomer3": {
+      "main": [
+        [
+          {
+            "node": "Fortmatear Hora2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contactcustomer1": {
+      "main": [
+        [
+          {
+            "node": "Bucle por llamada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contactcustomer4": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Patrón de LLamadas",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Bucle por PlaceID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fortmatear Hora1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fortmatear Hora2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Bucle por llamada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Bucle por PlaceID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "69e0415e-c686-4f55-a629-a470b81df638",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "91e9bc2fd2d08736422cccee7e1506bda336e368f82dcb792c9d1bbf6348503c"
+  },
+  "id": "GC6vLZrzerZzaz2U",
+  "tags": []
+}

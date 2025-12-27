@@ -1,0 +1,1436 @@
+{
+  "name": "❌ LLamadas Idealista",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9ad93033-f438-4214-a093-4b373c992279",
+              "leftValue": "={{ $json['nombres llamados'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1344,
+        240
+      ],
+      "id": "df22e2d4-f6dd-41a4-8750-5fe08ec0ecce",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1DmghD8bdqQt9DuMLiZXaGLzh30r8Qh3OhrKK1cAQsG8",
+          "mode": "list",
+          "cachedResultName": "17.03.2025 - 006",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DmghD8bdqQt9DuMLiZXaGLzh30r8Qh3OhrKK1cAQsG8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 380773518,
+          "mode": "list",
+          "cachedResultName": "17.03.2025 - 006",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DmghD8bdqQt9DuMLiZXaGLzh30r8Qh3OhrKK1cAQsG8/edit#gid=380773518"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Estado",
+              "lookupValue": "no_llamado"
+            },
+            {
+              "lookupColumn": "Tipo de vendedor",
+              "lookupValue": "Profesional"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -1696,
+        240
+      ],
+      "id": "4fb5bd54-0ea9-40df-ac86-9c90602bfc19",
+      "name": "Leads",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1DmghD8bdqQt9DuMLiZXaGLzh30r8Qh3OhrKK1cAQsG8",
+          "mode": "list",
+          "cachedResultName": "resultados",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DmghD8bdqQt9DuMLiZXaGLzh30r8Qh3OhrKK1cAQsG8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 380773518,
+          "mode": "list",
+          "cachedResultName": "17.03.2025 - 006",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DmghD8bdqQt9DuMLiZXaGLzh30r8Qh3OhrKK1cAQsG8/edit#gid=380773518"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Id del anuncio": "={{ $('Leads').item.json['Id del anuncio'] }}",
+            "Estado": "empresa_ya_contactada_antes"
+          },
+          "matchingColumns": [
+            "Id del anuncio"
+          ],
+          "schema": [
+            {
+              "id": "Id del anuncio",
+              "displayName": "Id del anuncio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Título",
+              "displayName": "Título",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tipo de inmueble",
+              "displayName": "Tipo de inmueble",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Descripción",
+              "displayName": "Descripción",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Teléfono",
+              "displayName": "Teléfono",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Dirección",
+              "displayName": "Dirección",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Precio",
+              "displayName": "Precio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Habitaciones",
+              "displayName": "Habitaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tipo de vendedor",
+              "displayName": "Tipo de vendedor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre del vendedor",
+              "displayName": "Nombre del vendedor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -1136,
+        144
+      ],
+      "id": "8c82b73c-0a44-4716-809a-fb77b996cc08",
+      "name": "Sí",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1DmghD8bdqQt9DuMLiZXaGLzh30r8Qh3OhrKK1cAQsG8",
+          "mode": "list",
+          "cachedResultName": "resultados",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DmghD8bdqQt9DuMLiZXaGLzh30r8Qh3OhrKK1cAQsG8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1218909883,
+          "mode": "list",
+          "cachedResultName": "nombres",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DmghD8bdqQt9DuMLiZXaGLzh30r8Qh3OhrKK1cAQsG8/edit#gid=1218909883"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "nombres llamados": "={{ $('Leads').item.json['Nombre del vendedor'] }}"
+          },
+          "matchingColumns": [
+            "nombres llamados"
+          ],
+          "schema": [
+            {
+              "id": "nombres llamados",
+              "displayName": "nombres llamados",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -1120,
+        432
+      ],
+      "id": "27b5cb23-9fe3-4ade-94ce-e5e0d50a5a04",
+      "name": "No",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.retellai.com/v2/create-phone-call",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer key_b23d4250476051afb95b70a760de"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"from_number\": \"+34936940146\",\n  \"to_number\": \"+34{{ $('Leads').item.json[\"Teléfono\"] }}\",\n  \"retell_llm_dynamic_variables\": {\n    \"nombre\": \"{{ $('Leads').item.json[\"Nombre del vendedor\"] }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -880,
+        432
+      ],
+      "id": "a3f10f7a-9d78-4885-9abd-dd58cf268207",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1DmghD8bdqQt9DuMLiZXaGLzh30r8Qh3OhrKK1cAQsG8",
+          "mode": "list",
+          "cachedResultName": "resultados",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DmghD8bdqQt9DuMLiZXaGLzh30r8Qh3OhrKK1cAQsG8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 380773518,
+          "mode": "list",
+          "cachedResultName": "17.03.2025 - 006",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DmghD8bdqQt9DuMLiZXaGLzh30r8Qh3OhrKK1cAQsG8/edit#gid=380773518"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Id del anuncio": "={{ $('Leads').item.json['Id del anuncio'] }}",
+            "Estado": "en_curso"
+          },
+          "matchingColumns": [
+            "Id del anuncio"
+          ],
+          "schema": [
+            {
+              "id": "Id del anuncio",
+              "displayName": "Id del anuncio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Título",
+              "displayName": "Título",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tipo de inmueble",
+              "displayName": "Tipo de inmueble",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Descripción",
+              "displayName": "Descripción",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Teléfono",
+              "displayName": "Teléfono",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Dirección",
+              "displayName": "Dirección",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Precio",
+              "displayName": "Precio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Habitaciones",
+              "displayName": "Habitaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tipo de vendedor",
+              "displayName": "Tipo de vendedor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre del vendedor",
+              "displayName": "Nombre del vendedor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -656,
+        432
+      ],
+      "id": "77707e96-b71b-4c1a-bd5e-76683959676e",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 20
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -480,
+        432
+      ],
+      "id": "a94f2a22-6592-4d0a-86f0-9ebf570c66d4",
+      "name": "Wait",
+      "webhookId": "1d3527da-5d78-4695-af84-17c1c20072bb"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.retellai.com/v2/get-call/{{ $('HTTP Request').item.json.call_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer key_b23d4250476051afb95b70a760de"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -288,
+        432
+      ],
+      "id": "862f551c-7a36-4d48-9b7f-7f3608b07c90",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f5976370-3742-405a-9833-534a6d29a0b2",
+              "leftValue": "={{ $json.call_status }}",
+              "rightValue": "ended",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "aa1356f5-4ede-4299-bf06-b0eea03b1992",
+              "leftValue": "={{ $json.call_status }}",
+              "rightValue": "error",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        432
+      ],
+      "id": "c194bcd2-b22d-4d86-a96a-4cd7ce1e2aad",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "44118531-ff4b-45d0-83b4-ba87e4e5007d",
+              "leftValue": "={{ $('HTTP Request2').item.json.call_analysis.custom_analysis_data.user_responded }}",
+              "rightValue": "false",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -656,
+        144
+      ],
+      "id": "f26883ed-2e50-4a00-8c3a-03356a701b67",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "amount": 20
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        448
+      ],
+      "id": "07c9529e-d9e6-4358-9670-ff2ea7b0def4",
+      "name": "Wait1",
+      "webhookId": "b00d8e96-2baf-49dd-aa0d-cb6f7c03716e"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1DmghD8bdqQt9DuMLiZXaGLzh30r8Qh3OhrKK1cAQsG8",
+          "mode": "list",
+          "cachedResultName": "resultados",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DmghD8bdqQt9DuMLiZXaGLzh30r8Qh3OhrKK1cAQsG8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 953431135,
+          "mode": "list",
+          "cachedResultName": "resultados",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DmghD8bdqQt9DuMLiZXaGLzh30r8Qh3OhrKK1cAQsG8/edit#gid=953431135"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nombre": "={{ $('Leads').item.json[\"Nombre del vendedor\"] }}",
+            "id del anuncio": "={{ $('Leads').item.json[\"Id del anuncio\"] }}",
+            "Teléfono": "={{ $('Leads').item.json[\"Teléfono\"] }}",
+            "Transcripción": "={{ $('HTTP Request1').item.json.transcript }}",
+            "Exito": "={{ $('HTTP Request1').item.json.call_analysis.call_successful }}",
+            "audio": "={{ $('HTTP Request1').item.json.recording_url }}",
+            "id llamada": "={{ $('HTTP Request1').item.json.call_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Nombre",
+              "displayName": "Nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "id del anuncio",
+              "displayName": "id del anuncio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Teléfono",
+              "displayName": "Teléfono",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Transcripción",
+              "displayName": "Transcripción",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Exito",
+              "displayName": "Exito",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notas",
+              "displayName": "Notas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "id llamada",
+              "displayName": "id llamada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "audio",
+              "displayName": "audio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -464,
+        144
+      ],
+      "id": "2450ced7-053a-42b1-a06c-16b976c2a127",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1DmghD8bdqQt9DuMLiZXaGLzh30r8Qh3OhrKK1cAQsG8",
+          "mode": "list",
+          "cachedResultName": "resultados",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DmghD8bdqQt9DuMLiZXaGLzh30r8Qh3OhrKK1cAQsG8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 380773518,
+          "mode": "list",
+          "cachedResultName": "17.03.2025 - 006",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DmghD8bdqQt9DuMLiZXaGLzh30r8Qh3OhrKK1cAQsG8/edit#gid=380773518"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Id del anuncio": "={{ $('Leads').item.json[\"Id del anuncio\"] }}",
+            "Estado": "no_respondido"
+          },
+          "matchingColumns": [
+            "Id del anuncio"
+          ],
+          "schema": [
+            {
+              "id": "Id del anuncio",
+              "displayName": "Id del anuncio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Título",
+              "displayName": "Título",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tipo de inmueble",
+              "displayName": "Tipo de inmueble",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Descripción",
+              "displayName": "Descripción",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Teléfono",
+              "displayName": "Teléfono",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Dirección",
+              "displayName": "Dirección",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Precio",
+              "displayName": "Precio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Habitaciones",
+              "displayName": "Habitaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tipo de vendedor",
+              "displayName": "Tipo de vendedor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre del vendedor",
+              "displayName": "Nombre del vendedor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -464,
+        -144
+      ],
+      "id": "97af67e8-b84d-4911-a062-019baebd0e43",
+      "name": "Google Sheets2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -96,
+        128
+      ],
+      "id": "7f1bcb89-67bb-4de5-89af-62fa3df57fb1",
+      "name": "Wait2",
+      "webhookId": "8ed63fbd-07b3-4301-b4c6-2b3ac04a3443"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.retellai.com/v2/get-call/{{ $('HTTP Request').item.json.call_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer key_b23d4250476051afb95b70a760de"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -880,
+        144
+      ],
+      "id": "f45a5061-5af7-40fb-9475-45d6cb03702d",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds",
+              "secondsInterval": 40
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1888,
+        240
+      ],
+      "id": "8cc92ba3-3de5-4e45-8af7-16942b91c4a3",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "content": "# Descripción del flujo\n\nEste flujo de trabajo de n8n automatiza la gestión de leads obtenidos de una hoja de Google Sheets, verifica si ya han sido contactados anteriormente, realiza llamadas telefónicas a nuevos leads utilizando la API de Retell AI y actualiza los resultados en Google Sheets según los resultados de las llamadas. El flujo se ejecuta según un horario establecido y maneja el filtrado de leads, el seguimiento del estado de las llamadas y el registro de resultados de manera sistemática.\n\n### El flujo está diseñado para:\n◼ Obtener leads de una hoja de Google Sheets según criterios específicos.\n◼ Verificar si el lead ya ha sido contactado previamente.\n◼ Si no ha sido contactado, iniciar una llamada telefónica y registrar el intento.\n◼ Monitorear el estado de la llamada y actualizar el estado del lead en consecuencia.\n◼ Almacenar los resultados de la llamada, incluyendo transcripciones e indicadores de éxito, en una hoja de resultados.",
+        "height": 360,
+        "width": 700
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1920,
+        -288
+      ],
+      "typeVersion": 1,
+      "id": "bd7a5716-7a6f-479e-97eb-a011081d9df9",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Activa el flujo de trabajo cada 40 segundos para procesar leads.",
+        "height": 320,
+        "width": 170,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1920,
+        112
+      ],
+      "typeVersion": 1,
+      "id": "aaa9b1c7-7bb6-495e-8f90-6d51c1f89d3d",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "Recupera leads de una hoja de Google Sheets que cumplen con filtros específicos.",
+        "height": 320,
+        "width": 150,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1744,
+        112
+      ],
+      "typeVersion": 1,
+      "id": "679a76b2-8f1e-4e82-a685-c57646378b3d",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "Comprueba si el nombre del vendedor del lead (**Nombre del vendedor**) existe en una lista de nombres previamente llamados.",
+        "height": 320,
+        "width": 190,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1584,
+        112
+      ],
+      "typeVersion": 1,
+      "id": "714d427e-5182-4149-9401-14f0c07749f1",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1DmghD8bdqQt9DuMLiZXaGLzh30r8Qh3OhrKK1cAQsG8",
+          "mode": "list",
+          "cachedResultName": "resultados",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DmghD8bdqQt9DuMLiZXaGLzh30r8Qh3OhrKK1cAQsG8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1218909883,
+          "mode": "list",
+          "cachedResultName": "nombres",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DmghD8bdqQt9DuMLiZXaGLzh30r8Qh3OhrKK1cAQsG8/edit#gid=1218909883"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "nombres llamados",
+              "lookupValue": "={{ $json['Nombre del vendedor'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -1520,
+        240
+      ],
+      "id": "be25e2cd-d8cd-4f69-a71c-866d1656088e",
+      "name": "Hemos llamado ya a la empresa'?",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gpLvhu8dEe5EEmu3",
+          "name": "Google Sheets OptimaQuantum"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Determina si el lead ya ha sido contactado previamente según la existencia de **nombres llamados**.",
+        "height": 320,
+        "width": 170
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1376,
+        112
+      ],
+      "typeVersion": 1,
+      "id": "5481ada8-09e5-4386-89ed-fac08db826f1",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "Actualiza el estado del lead a \"**empresa_ya_contactada_antes**\" si ya ha sido llamado anteriormente.",
+        "height": 260,
+        "width": 250,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1200,
+        48
+      ],
+      "typeVersion": 1,
+      "id": "34beb531-7963-4bef-8772-663a1ddeeae3",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "Registra el **Nombre del vendedor** del lead en la hoja \"**nombres**\" para marcarlo como contactado.",
+        "height": 260,
+        "width": 250,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1200,
+        320
+      ],
+      "typeVersion": 1,
+      "id": "3e35936a-05fc-4f66-a955-00a23808b674",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "Inicia una llamada telefónica al lead utilizando la API de Retell AI.",
+        "height": 260,
+        "width": 230,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -944,
+        320
+      ],
+      "typeVersion": 1,
+      "id": "ce7ba168-c218-442d-add7-3e45f7d836a8",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "Actualiza el estado del lead a \"**en_curso**\" mientras se realiza la llamada.",
+        "height": 260,
+        "width": 190,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -704,
+        320
+      ],
+      "typeVersion": 1,
+      "id": "dd41acd3-f52b-4508-90c8-233ee482ddf2",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "Pausa el flujo durante 20 segundos para permitir que la llamada progrese.",
+        "height": 260,
+        "width": 170
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -496,
+        320
+      ],
+      "typeVersion": 1,
+      "id": "6d9d63c8-ac70-49d1-a384-dd75d4fff318",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "Recupera el estado de la llamada desde Retell AI usando el call_id.",
+        "height": 260,
+        "width": 170,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -320,
+        320
+      ],
+      "typeVersion": 1,
+      "id": "8c9996a7-5fee-4ecd-a017-5eb592d452f9",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "Verifica si la llamada ha terminado o ha encontrado un error.",
+        "height": 260,
+        "width": 170
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -144,
+        320
+      ],
+      "typeVersion": 1,
+      "id": "6f659555-8143-438d-a01f-68b898b3124f",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "Pausa durante 20 segundos si la llamada aún está en curso, luego verifica el estado nuevamente.",
+        "height": 260,
+        "width": 190
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        48,
+        320
+      ],
+      "typeVersion": 1,
+      "id": "d630b8a5-40c1-4720-af31-00bddb904189",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "Pausa durante 15 segundos antes de recuperar los detalles finales de la llamada.",
+        "height": 240,
+        "width": 230
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -144,
+        48
+      ],
+      "typeVersion": 1,
+      "id": "13cf19da-2eb5-4dac-a026-8a100684aeb3",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "Recupera los detalles finales de la llamada después de que haya terminado.",
+        "height": 260,
+        "width": 230,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -944,
+        48
+      ],
+      "typeVersion": 1,
+      "id": "b920f825-5062-49af-afa0-42c24a7032ec",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "Verifica si el usuario respondió durante la llamada.",
+        "height": 260,
+        "width": 190
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -704,
+        48
+      ],
+      "typeVersion": 1,
+      "id": "9cd23925-6c23-4213-ab98-e31dd618de8b",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "content": "Registra los detalles de la llamada si el usuario respondió.",
+        "height": 260,
+        "width": 170,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -496,
+        48
+      ],
+      "typeVersion": 1,
+      "id": "3f0e6334-ebb2-4795-aaa4-da63746f110d",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "content": "Actualiza el estado del lead a \"no_respondido\" si el usuario no contestó.",
+        "height": 260,
+        "width": 170,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -496,
+        -240
+      ],
+      "typeVersion": 1,
+      "id": "3013d05d-bbf5-4a89-ad68-98302dba53b5",
+      "name": "Sticky Note17"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Sí",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leads": {
+      "main": [
+        [
+          {
+            "node": "Hemos llamado ya a la empresa'?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hemos llamado ya a la empresa'?": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d1b221ae-3af0-45eb-a283-f50f28659717",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "91e9bc2fd2d08736422cccee7e1506bda336e368f82dcb792c9d1bbf6348503c"
+  },
+  "id": "GtgcbzqPNzkjr2tD",
+  "tags": []
+}
