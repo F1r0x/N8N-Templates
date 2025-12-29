@@ -1,5 +1,7 @@
 import os
 import re
+from urllib.parse import quote
+
 
 # ========= CONFIGURACIÓN =========
 INDEX_START = "<!-- INDEX_START -->"
@@ -64,7 +66,9 @@ def scan_directory(base=".", depth=0):
             if not is_valid_file(entry, full_path):
                 continue
             # Para archivos JSON con iconos, Markdown y demás
-            folder_items.append((depth, f"📄 [{entry}]({rel_path})"))
+            url_path = quote(rel_path)
+            folder_items.append((depth, f"📄 [{entry}]({url_path})"))
+
 
     if folder_items:
         items.extend(folder_items)
