@@ -1,102 +1,116 @@
 import os
 import re
 
-COURSES_START = "<!-- COURSES_START -->"
-COURSES_END = "<!-- COURSES_END -->"
-GAMES_START = "<!-- GAMES_START -->"
-GAMES_END = "<!-- GAMES_END -->"
+# ========= CONFIGURACIÓN =========
 
-# Carpetas o archivos a excluir
-EXCLUDE = {".git", ".github", "scripts", "__pycache__", ".vscode", ".env", "nore"}
+INDEX_START = "<!-- INDEX_START -->"
+INDEX_END = "<!-- INDEX_END -->"
 
-def read_info(folder):
-    """Lee info.txt si existe, si no devuelve cadena vacía"""
-    info_path = os.path.join(folder, "info.txt")
-    if os.path.exists(info_path):
-        try:
-            return open(info_path, encoding="utf-8").read().strip()
-        except:
-            return ""  # Si hay algún error, devolvemos vacío
-    return ""  # Si no existe info.txt devolvemos vacío
+EXCLUDE_DIRS = {
+    ".git", ".github", "scripts", "__pycache__",
+    ".vscode", "node_modules", ".env"
+}
 
-def count_scripts(folder):
-    """Cuenta solo los scripts .py visibles y válidos"""
-    try:
-        return len([
-            f for f in os.listdir(folder)
-            if f.endswith(".py") and not f.startswith("_") and f not in EXCLUDE
-        ])
-    except FileNotFoundError:
-        return 0
+EXCLUDE_FILES = {
+    ".gitignore"
+}
 
-def is_valid_folder(folder):
-    """Devuelve True si la carpeta es válida"""
-    name = os.path.basename(folder)
-    if name in EXCLUDE:
+ALLOWED_EXTENSIONS = {
+    ".md", ".txt", ".pdf", ".py", ".sh"
+}
+
+MAX_DEPTH = 3
+
+# ========= LÓGICA =========
+
+def is_valid_dir(name):
+    return (
+        name not in EXCLUDE_DIRS
+        and not name.startswith(".")
+        and not name.startswith("__")
+    )
+
+def is_valid_file(name, full_path):
+    # Excluir SOLO el README.md de la raíz del repo
+    root_readme = os.path.abspath("README.md")
+    current_file = os.path.abspath(full_path)
+
+    if name.lower() == "readme.md" and current_file == root_readme:
         return False
-    if name.startswith(".") or name.startswith("__"):
+
+    if name in EXCLUDE_FILES:
         return False
-    return True
 
-def get_courses():
-    courses = []
-    for d in os.listdir("."):
-        if d.startswith("CursoPython") and os.path.isdir(d) and is_valid_folder(d):
-            # Intentamos extraer número para ordenar
-            nums = re.findall(r"\d+", d)
-            number = int(nums[0]) if nums else 0
-            courses.append((number, d))
-    courses.sort(key=lambda x: x[0])
-    return [d for _, d in courses]
+    _, ext = os.path.splitext(name)
+    return ext.lower() in ALLOWED_EXTENSIONS
 
-def get_games():
-    if not os.path.isdir("Juegos"):
+
+def scan_directory(base=".", depth=0):
+    if depth > MAX_DEPTH:
         return []
-    return sorted([
-        d for d in os.listdir("Juegos")
-        if os.path.isdir(os.path.join("Juegos", d)) and is_valid_folder(d)
-    ])
 
-def generate_section(items, base_path=""):
+    items = []
+
+    try:
+        entries = sorted(os.listdir(base))
+    except PermissionError:
+        return []
+
+    folder_items = []
+
+    for entry in entries:
+        full_path = os.path.join(base, entry)
+        rel_path = full_path.replace("\\", "/").lstrip("./")
+
+        if os.path.isdir(full_path):
+            if not is_valid_dir(entry):
+                continue
+
+            sub_items = scan_directory(full_path, depth + 1)
+
+            if sub_items:
+                folder_items.append((depth, f"📁 **[{entry}]({rel_path})**"))
+                folder_items.extend(sub_items)
+
+        elif os.path.isfile(full_path):
+            if not is_valid_file(entry, full_path):
+                continue
+            folder_items.append((depth + 1, f"📄 [{entry}]({rel_path})"))
+
+    if folder_items:
+        items.extend(folder_items)
+
+    return items
+
+
+def build_markdown(items):
     lines = []
-    for item in items:
-        path = os.path.join(base_path, item).replace("\\", "/")
-        scripts = count_scripts(path)
-        if scripts == 0:
-            continue  # No mostramos carpetas vacías de scripts
-        info = read_info(path)
-        # Creamos enlace clicable, y solo mostramos info si existe
-        if info:
-            lines.append(f"- 📁 **[{item}]({path})** ({scripts} scripts)  \n  {info}\n")
-        else:
-            lines.append(f"- 📁 **[{item}]({path})** ({scripts} scripts)\n")
+    for depth, text in items:
+        indent = "  " * depth
+        lines.append(f"{indent}- {text}")
     return "\n".join(lines)
 
-# Leer README actual
+# ========= ACTUALIZAR README =========
+
 with open("README.md", encoding="utf-8") as f:
     content = f.read()
 
-# Generar secciones
-courses_md = generate_section(get_courses())
-games_md = generate_section(get_games(), "Juegos")
+index_items = scan_directory()
+index_md = build_markdown(index_items)
 
-# Reemplazar secciones en README
-content = re.sub(
-    f"{COURSES_START}.*?{COURSES_END}",
-    f"{COURSES_START}\n{courses_md}\n{COURSES_END}",
-    content,
+pattern = re.compile(
+    f"{INDEX_START}.*?{INDEX_END}",
     flags=re.S
 )
 
-content = re.sub(
-    f"{GAMES_START}.*?{GAMES_END}",
-    f"{GAMES_START}\n{games_md}\n{GAMES_END}",
-    content,
-    flags=re.S
-)
+replacement = f"{INDEX_START}\n{index_md}\n{INDEX_END}"
 
-# Guardar README actualizado
+if pattern.search(content):
+    content = pattern.sub(replacement, content)
+else:
+    content += f"\n\n{replacement}\n"
+
 with open("README.md", "w", encoding="utf-8") as f:
     f.write(content)
 
-print("✔ README actualizado con cursos y juegos y enlaces (robusto)")
+print("✔ README actualizado con índice global")
